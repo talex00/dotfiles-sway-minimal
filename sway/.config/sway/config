@@ -1,0 +1,195 @@
+# #######################################################################################
+# SWAY CONFIG — минималистичная конфигурация.
+# Нативный sway-стек.
+# #######################################################################################
+
+################
+### MONITORS ###
+################
+include ~/.config/sway/monitors.conf
+
+###################
+### MY PROGRAMS ###
+###################
+set $terminal foot
+set $fileManager thunar
+set $menu fuzzel
+set $mod Mod4
+
+#################
+### AUTOSTART ###
+#################
+# waybar — exec_always, чтобы перезапускался при reload (аналог Ctrl+Super+Alt+R).
+# Редирект в лог обязателен: без него sway-порождённый waybar падает по SIGPIPE.
+exec_always pkill -x waybar
+exec_always waybar > /tmp/waybar.log 2>&1
+exec mako
+# swaybg: обои из сохранённого выбора (scripts/wallpaper.sh), иначе дефолт
+exec swaybg -m fill -i "$(cat $HOME/.config/sway/wallpaper 2>/dev/null || echo $HOME/Pictures/Wallpapers/frieren_meme.webp)"
+exec batsignal -b > /tmp/batsignal.log 2>&1
+# Tray-апплеты (иконки в waybar-трее с правоклик-меню)
+exec nm-applet --indicator > /tmp/nm-applet.log 2>&1
+exec blueman-applet > /tmp/blueman-applet.log 2>&1
+exec wl-paste --type text --watch cliphist store
+exec wl-paste --type image --watch cliphist store
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+
+# swayidle — блокировка экрана и управление dpms по таймауту
+exec swayidle -w \
+    timeout 30  'pgrep -x swaylock && swaymsg output * dpms off' resume 'swaymsg output * dpms on' \
+    timeout 600 'loginctl lock-session' \
+    timeout 630 'swaymsg output * dpms off'                 resume 'swaymsg output * dpms on' \
+    before-sleep 'loginctl lock-session' > /tmp/swayidle.log 2>&1
+
+#############################
+### ENVIRONMENT / CURSOR  ###
+#############################
+font pango:JetBrains Mono 11
+seat * xcursor_theme default 24
+xwayland enable
+
+#####################
+### LOOK AND FEEL ###
+#####################
+gaps inner 0
+gaps outer 0
+# Рамки включены, чтобы было видно активное окно.
+# В sway нет прозрачности окон — поэтому active = цветная рамка, inactive = серая.
+default_border pixel 2
+default_floating_border pixel 2
+focus_follows_mouse yes
+smart_gaps off
+# smart_borders: убирает рамку, если на воркспейсе одно окно (чище)
+smart_borders on
+titlebar_border_thickness 0
+titlebar_padding 0
+
+# Цвета рамок: focused — голубой (#33ccff), inactive/unfocused — серый (#595959).
+# Формат: client.<state> <border> <background> <text> <indicator> <child_border>
+client.focused          #33ccff #33ccff #ffffff #00ff99 #33ccff
+client.focused_inactive #595959 #595959 #ffffff #595959 #595959
+client.unfocused        #595959 #595959 #ffffff #595959 #595959
+client.urgent           #ff0000 #ff0000 #ffffff #ff0000 #ff0000
+
+#############
+### INPUT ###
+#############
+input type:keyboard {
+    xkb_layout "us,ru"
+    xkb_options "grp:win_space_toggle"
+}
+input type:touchpad {
+    natural_scroll enabled
+    scroll_factor 0.5
+    tap enabled
+}
+input * {
+    accel_profile flat
+    pointer_accel 0
+}
+
+###################
+### KEYBINDINGS ###
+###################
+bindsym --to-code $mod+T exec $terminal
+bindsym --to-code $mod+Q kill
+bindsym Ctrl+Mod1+Delete exec ~/.config/sway/scripts/powermenu.sh
+bindsym --to-code $mod+W exec ~/.config/sway/scripts/wallpaper.sh
+bindsym --to-code $mod+E exec $fileManager
+bindsym --to-code $mod+L exec swaylock
+bindsym --to-code $mod+B floating toggle
+# pin в sway ≈ sticky (окно видно на всех воркспейсах; работает для floating)
+bindsym --to-code $mod+P sticky toggle
+bindsym --to-code $mod+V exec cliphist list | fuzzel --dmenu | cliphist decode | wl-copy
+bindsym --to-code $mod+D exec $menu
+bindsym --to-code $mod+bracketright exec ~/.config/sway/scripts/script_selector.sh
+bindsym --to-code $mod+Shift+S exec grim -g "$(slurp)" - | wl-copy
+bindsym --to-code $mod+Ctrl+S exec ~/.config/sway/scripts/screenshot.sh
+bindsym --to-code $mod+F fullscreen
+bindsym --to-code $mod+N exec pkill gammastep || gammastep -O 4500
+bindsym --to-code Ctrl+$mod+Mod1+R reload
+
+# Alt-Tab: цикл по окнам (аналог cyclenext)
+bindsym Mod1+Tab focus right
+bindsym Mod1+Shift+Tab focus left
+
+# Move focus
+bindsym $mod+Left  focus left
+bindsym $mod+Right focus right
+bindsym $mod+Up    focus up
+bindsym $mod+Down  focus down
+
+# Move window
+bindsym $mod+Shift+Left  move left
+bindsym $mod+Shift+Right move right
+bindsym $mod+Shift+Up    move up
+bindsym $mod+Shift+Down  move down
+
+# Switch workspaces
+bindsym --to-code $mod+1 workspace number 1
+bindsym --to-code $mod+2 workspace number 2
+bindsym --to-code $mod+3 workspace number 3
+bindsym --to-code $mod+4 workspace number 4
+bindsym --to-code $mod+5 workspace number 5
+bindsym --to-code $mod+6 workspace number 6
+bindsym --to-code $mod+7 workspace number 7
+bindsym --to-code $mod+8 workspace number 8
+bindsym --to-code $mod+9 workspace number 9
+bindsym --to-code $mod+0 workspace number 10
+
+# Move active window to workspace (и переключиться — аналог movetoworkspace)
+bindsym --to-code $mod+Shift+1 move container to workspace number 1, workspace number 1
+bindsym --to-code $mod+Shift+2 move container to workspace number 2, workspace number 2
+bindsym --to-code $mod+Shift+3 move container to workspace number 3, workspace number 3
+bindsym --to-code $mod+Shift+4 move container to workspace number 4, workspace number 4
+bindsym --to-code $mod+Shift+5 move container to workspace number 5, workspace number 5
+bindsym --to-code $mod+Shift+6 move container to workspace number 6, workspace number 6
+bindsym --to-code $mod+Shift+7 move container to workspace number 7, workspace number 7
+bindsym --to-code $mod+Shift+8 move container to workspace number 8, workspace number 8
+bindsym --to-code $mod+Shift+9 move container to workspace number 9, workspace number 9
+bindsym --to-code $mod+Shift+0 move container to workspace number 10, workspace number 10
+
+# Move silently (без переключения — аналог movetoworkspacesilent)
+bindsym --to-code $mod+Ctrl+1 move container to workspace number 1
+bindsym --to-code $mod+Ctrl+2 move container to workspace number 2
+bindsym --to-code $mod+Ctrl+3 move container to workspace number 3
+bindsym --to-code $mod+Ctrl+4 move container to workspace number 4
+bindsym --to-code $mod+Ctrl+5 move container to workspace number 5
+bindsym --to-code $mod+Ctrl+6 move container to workspace number 6
+bindsym --to-code $mod+Ctrl+7 move container to workspace number 7
+bindsym --to-code $mod+Ctrl+8 move container to workspace number 8
+bindsym --to-code $mod+Ctrl+9 move container to workspace number 9
+bindsym --to-code $mod+Ctrl+0 move container to workspace number 10
+
+# Scroll через воркспейсы (над окном)
+bindsym --whole-window $mod+button5 workspace next
+bindsym --whole-window $mod+button4 workspace prev
+
+# Drag floating-окон мышью (аналог bindm Super+Z / X)
+floating_modifier $mod normal
+
+# Laptop multimedia keys
+bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym --locked XF86AudioMute        exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym --locked XF86AudioMicMute     exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+bindsym XF86MonBrightnessUp   exec ~/.config/sway/scripts/interactive/brightness.sh up
+bindsym XF86MonBrightnessDown exec ~/.config/sway/scripts/interactive/brightness.sh down
+
+# playerctl
+bindsym --locked XF86AudioNext  exec playerctl next
+bindsym --locked XF86AudioPause exec playerctl play-pause
+bindsym --locked XF86AudioPlay  exec playerctl play-pause
+bindsym --locked XF86AudioPrev  exec playerctl previous
+
+#############
+### GESTURES  (аналог gesture = 3, horizontal, workspace) ###
+#############
+bindgesture swipe:3:left  workspace next_on_output
+bindgesture swipe:3:right workspace prev_on_output
+
+##############################
+### WINDOWS AND WORKSPACES ###
+##############################
+# Thunar — всплывающие диалоги по центру
+for_window [app_id="thunar" floating=true] move position center

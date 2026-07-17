@@ -1,0 +1,28 @@
+# Светлый минималистичный экран блокировки.
+# Фон белый, рамка/текст чёрные, шрифт JetBrains Mono.
+
+color=ffffff
+font=JetBrains Mono
+font-size=20
+indicator-radius=25
+indicator-thickness=2
+
+# Поле ввода
+inside-color=ffffff
+inside-clear-color=ffffff
+inside-ver-color=ffffff
+inside-wrong-color=ffffff
+ring-color=000000
+ring-clear-color=000000
+ring-ver-color=000000
+ring-wrong-color=ff0000
+key-hl-color=000000
+bs-hl-color=cc372c
+text-color=000000
+line-color=000000
+separator-color=000000
+
+# Часы
+timestr=%H:%M
+datestr=
+clock-font-size=64

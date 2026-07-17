@@ -1,0 +1,83 @@
+{
+    "layer": "top",
+    "position": "left",
+    "width": 25,
+    "spacing": 4,
+    "modules-left": [
+        "sway/workspaces"
+    ],
+    "modules-center": [
+        "custom/window"
+    ],
+    "modules-right": [
+        "sway/language",
+        "tray",
+        "pulseaudio",
+        "clock",
+        "battery"
+    ],
+    "sway/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "format": "{name}"
+    },
+    "clock": {
+        "format": "{:%H\n%M}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "format-alt": "{:%Y-%m-%d}"
+    },
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{capacity}%",
+        "format-charging": "{capacity}%",
+        "format-plugged": "{capacity}%",
+        "format-alt": "{time} {icon}",
+        "format-icons": [
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+    },
+    "pulseaudio": {
+        "format": "{volume}%",
+        "format-muted": "󰝟",
+        "format-bluetooth": "{volume}%",
+        "format-bluetooth-muted": "",
+        "format-icons": {
+            "headphone": "󰋋",
+            "hands-free": "󰋎",
+            "headset": "󰋎",
+            "phone": "󰏲",
+            "portable": "󰏲",
+            "car": "󰄄",
+            "default": [
+                "󰕿",
+                "󰖀",
+                "󰕾"
+            ]
+        },
+        "on-click": "pavucontrol"
+    },
+    "sway/language": {
+        "format": "{}",
+        "format-en": "US",
+        "format-ru": "RU"
+    },
+    "sway/window": {
+        "format": "{}",
+        "max-length": 20
+    },
+    "custom/window": {
+        "exec": "~/.config/sway/scripts/waybar-window.sh",
+        "return-type": "json",
+        "escape": true,
+        "interval": 1,
+        "format": "{}",
+        "tooltip": true
+    }
+}

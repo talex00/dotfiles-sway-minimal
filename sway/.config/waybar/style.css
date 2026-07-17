@@ -1,0 +1,70 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "JetBrains Mono", sans-serif;
+    font-size: 10px;
+    min-height: 0;
+    min-width: 0;
+}
+
+window#waybar {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+#workspaces button {
+    padding: 2px 0;
+    color: #888888;
+}
+
+#workspaces button.focused {
+    color: #000000;
+    font-weight: bold;
+}
+
+#workspaces button.urgent {
+    color: #ff0000;
+}
+
+#clock,
+#battery,
+#network,
+#pulseaudio,
+#language,
+#tray {
+    padding: 2px 0;
+    margin: 0;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #2ecc71;
+}
+
+#battery.critical:not(.charging) {
+    color: #f53c3c;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}
+
+#window,
+#custom-window {
+    font-weight: normal;
+}
+
+/* Вертикальный заголовок окна: меньший шрифт → компактный шаг строк */
+#custom-window {
+    font-size: 8px;
+    padding: 0;
+    margin: 0;
+}
