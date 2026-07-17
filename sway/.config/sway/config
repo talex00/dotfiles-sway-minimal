@@ -41,10 +41,12 @@ exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DE
 #   630с (+30с)      → dpms off (экран выключается через 30с после блокировки)
 #   30с  (если уже залочено вручную Super+L) → dpms off
 #   before-sleep → swaylock (залочить перед сном)
+# NB: "*" обязательно в кавычках — swayidle запускает команды через sh -c,
+# и без кавычек sh разворачивает * в файлы CWD → swaymsg ломается.
 exec swayidle -w \
-    timeout 30  'pgrep -x swaylock && swaymsg output * dpms off' resume 'swaymsg output * dpms on' \
+    timeout 30  'pgrep -x swaylock && swaymsg output "*" dpms off' resume 'swaymsg output "*" dpms on' \
     timeout 600 'swaylock -f' \
-    timeout 630 'swaymsg output * dpms off'                 resume 'swaymsg output * dpms on' \
+    timeout 630 'swaymsg output "*" dpms off'               resume 'swaymsg output "*" dpms on' \
     before-sleep 'swaylock -f' > /tmp/swayidle.log 2>&1
 
 #############################
