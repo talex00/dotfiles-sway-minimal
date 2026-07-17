@@ -34,12 +34,18 @@ exec wl-paste --type text --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
-# swayidle — блокировка экрана и управление dpms по таймауту
+# swayidle — блокировка экрана и dpms по таймауту.
+# ВАЖНО: sway (в отличие от hyprland) сам НЕ запускает locker по сигналу
+# loginctl lock-session, поэтому лочим напрямую через 'swaylock -f'.
+#   600с бездействия → swaylock (экран блокировки)
+#   630с (+30с)      → dpms off (экран выключается через 30с после блокировки)
+#   30с  (если уже залочено вручную Super+L) → dpms off
+#   before-sleep → swaylock (залочить перед сном)
 exec swayidle -w \
     timeout 30  'pgrep -x swaylock && swaymsg output * dpms off' resume 'swaymsg output * dpms on' \
-    timeout 600 'loginctl lock-session' \
+    timeout 600 'swaylock -f' \
     timeout 630 'swaymsg output * dpms off'                 resume 'swaymsg output * dpms on' \
-    before-sleep 'loginctl lock-session' > /tmp/swayidle.log 2>&1
+    before-sleep 'swaylock -f' > /tmp/swayidle.log 2>&1
 
 #############################
 ### ENVIRONMENT / CURSOR  ###
