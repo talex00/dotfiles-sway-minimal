@@ -4,6 +4,7 @@
 
 ## 🛠 Установленные компоненты и функции
 - **Оконный менеджер**: Sway
+- **Тайлинг**: autotiling (спиральный/dwindle-тайлинг — аналог Hyprland Dwindle)
 - **Терминал**: foot (быстрый Wayland-терминал)
 - **Файловый менеджер**: Thunar
 - **Панель состояния**: Waybar (вертикальная, слева)
@@ -26,7 +27,7 @@
 yay -S sway swaylock swayidle swaybg gammastep grim slurp \
     waybar fuzzel foot thunar stow fastfetch \
     wl-clipboard cliphist mako batsignal jq playerctl \
-    brightnessctl ddcutil network-manager-applet blueman nwg-displays
+    brightnessctl ddcutil network-manager-applet blueman nwg-displays autotiling
 ```
 
 ## 🔗 Применение конфигурации (Stow)
@@ -90,6 +91,10 @@ swaymsg -t get_outputs
 > Бинды с буквами/цифрами используют флаг `--to-code` — работают при любой раскладке (us/ru).
 
 ## ℹ️ Примечания
+- **Dwindle-тайлинг**: sway/i3 использует ручной split-тайлинг, встроенного dwindle (как в Hyprland) нет.
+  Спиральное поведение даёт демон **autotiling** — он чередует направление split по соотношению сторон.
+  Ручной override направления split — команда `swaymsg split toggle` (полного аналога
+  `preserve_split = true` в sway нет: autotiling переопределит выбор при следующем окне).
 - **Rounding, blur, inactive_opacity** — фичи Hyprland/SwayFX. В обычном Sway их нет; активное окно
   подсвечивается цветной рамкой (`default_border pixel 2`, focused = голубой, inactive = серый).
   Для полной визуальной паритета поставьте форк **SwayFX** (drop-in замена, конфиг совместим).
