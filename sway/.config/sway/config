@@ -1,7 +1,9 @@
 # Sway. Минималистичное окружение: светлая тема, нулевые гэпы, тонкие рамки.
 # Внимание: sway не понимает комментарии в конце строки — только отдельной строкой.
 
-include ~/.config/sway/monitors.conf
+# Конфиг мониторов машинно-специфичный и в git не лежит. Глоб, а не прямой путь:
+# если файла нет, sway молча пропустит include вместо ошибки конфига.
+include ~/.config/sway/*.conf
 
 set $mod     Mod4
 set $term    foot
@@ -103,11 +105,22 @@ bindsym --to-code $mod+Ctrl+S exec $scripts/screenshot.sh
 bindsym --to-code Ctrl+$mod+Mod1+R reload
 bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
 
-# Handy (диктовка): на Wayland приложение не может перехватить глобальный
-# хоткей само, поэтому комбинацию держит sway и переключает запись сигналом
-# (так советует сам Handy). --to-code не нужен: Super_L — модификатор, не буква.
-# В настройках Handy нужен режим toggle, а не push-to-talk.
-bindsym Ctrl+Super_L exec pkill -USR2 -x handy
+# Handy (диктовка): на Wayland приложение не может перехватить глобальный хоткей
+# само, поэтому комбинацию держит sway и переключает запись сигналом SIGUSR2 —
+# так советует сама документация Handy. В настройках Handy нужен режим toggle,
+# а не push-to-talk: сигнал переключает запись, а не держит её.
+#
+# Команда — цепочка фоллбэков, чтобы по реакции системы было видно, что сломалось:
+# -x требует точного имени процесса, -i добавляет регистронезависимость (в AppImage
+# процесс называется Handy), дальше CLI, дальше уведомление.
+set $handy pkill -USR2 -xi handy || handy --toggle-transcription || notify-send "Handy" "процесс не найден"
+
+# Строк две не по ошибке: sway сравнивает маску модификаторов на точное равенство,
+# а Super здесь одновременно и модификатор, и сама клавиша — к моменту нажатия
+# Super_L бит Mod4 может быть уже выставлен. Совпасть одновременно они не могут,
+# так что двойного переключения записи не будет.
+bindsym Ctrl+Super_L      exec $handy
+bindsym Ctrl+$mod+Super_L exec $handy
 
 floating_modifier $mod normal
 

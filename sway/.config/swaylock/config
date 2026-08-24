@@ -1,31 +1,31 @@
-# Экран блокировки: обои рабочего стола + круг-индикатор по центру.
-# Нужен swaylock-effects: indicator, clock, timestr, datestr — его опции.
-# Сами обои подставляет scripts/lock.sh: в конфиге нет подстановки команд.
+# swaylock-effects. Обои те же, что на рабочем столе, — их подставляет
+# scripts/lock.sh, потому что в этом конфиге нет ни подстановки команд, ни ~.
+#
+# Пропорции времени и даты задаются двумя разными способами:
+#   время — font-size;
+#   дата  — indicator-radius / 6, отдельной опции для неё в swaylock-effects нет.
+# Поэтому дату подгоняем не размером, а форматом datestr: %a вместо %A даёт
+# строку примерно на ширину времени, а не вдвое шире его.
 
 indicator
 clock
 timestr=%H:%M
-datestr=%A, %-d %B
+datestr=%a, %-d %B
 font=Inter
-font-size=48
-indicator-radius=140
+font-size=120
+indicator-radius=280
 indicator-thickness=3
 scaling=fill
 
-# Кольцо белое, внутри чёрный с большой прозрачностью — чтобы время
-# читалось на любых обоях. Прозрачность — последние две цифры: 66 ≈ 40%, 99 ≈ 60%.
 ring-color=ffffff
 inside-color=00000066
 text-color=ffffff
 line-color=00000000
 separator-color=00000000
 
-# Ввод — зелёный, стирание — красный.
 key-hl-color=00ff99
 bs-hl-color=ff0000
 
-# У swaylock нет наследования цветов: каждое состояние описывается целиком,
-# иначе вылезают дефолтные оранжевый и синий.
 ring-clear-color=ffffff
 inside-clear-color=00000066
 text-clear-color=ffffff
