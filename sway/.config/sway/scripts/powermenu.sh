@@ -1,14 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-SELECTION=$(echo -e "Logout\nSuspend\nReboot\nShutdown" | fuzzel --dmenu -p "Power: ")
-
-case $SELECTION in
-    Logout)
-        swaymsg exit;;
-    Suspend)
-        systemctl suspend;;
-    Reboot)
-        systemctl reboot;;
-    Shutdown)
-        systemctl poweroff;;
+case $(printf 'Logout\nSuspend\nReboot\nShutdown\n' | fuzzel --dmenu -p 'Power: ') in
+    Logout)   swaymsg exit ;;
+    Suspend)  systemctl suspend ;;
+    Reboot)   systemctl reboot ;;
+    Shutdown) systemctl poweroff ;;
 esac

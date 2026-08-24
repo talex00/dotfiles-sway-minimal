@@ -1,14 +1,14 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: "JetBrains Mono", sans-serif;
+    font-family: "JetBrains Mono", monospace;
     font-size: 10px;
-    min-height: 0;
     min-width: 0;
+    min-height: 0;
 }
 
 window#waybar {
-    background-color: #ffffff;
+    background: #ffffff;
     color: #000000;
 }
 
@@ -26,14 +26,13 @@ window#waybar {
     color: #ff0000;
 }
 
-#clock,
-#battery,
-#network,
-#pulseaudio,
+#window,
 #language,
-#tray {
+#tray,
+#pulseaudio,
+#clock,
+#battery {
     padding: 2px 0;
-    margin: 0;
 }
 
 #battery.charging,
@@ -43,28 +42,9 @@ window#waybar {
 
 #battery.critical:not(.charging) {
     color: #f53c3c;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+    animation: blink 0.5s linear infinite alternate;
 }
 
 @keyframes blink {
-    to {
-        background-color: #ffffff;
-        color: #000000;
-    }
-}
-
-#window,
-#custom-window {
-    font-weight: normal;
-}
-
-/* Вертикальный заголовок окна: меньший шрифт → компактный шаг строк */
-#custom-window {
-    font-size: 8px;
-    padding: 0;
-    margin: 0;
+    to { color: #000000; }
 }
