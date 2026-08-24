@@ -1,19 +1,22 @@
 # swaylock-effects. Обои те же, что на рабочем столе, — их подставляет
 # scripts/lock.sh, потому что в этом конфиге нет ни подстановки команд, ни ~.
 #
-# Пропорции времени и даты задаются двумя разными способами:
+# Размеры связаны жёстко, отдельной опции для даты в swaylock-effects нет:
 #   время — font-size;
-#   дата  — indicator-radius / 6, отдельной опции для неё в swaylock-effects нет.
-# Поэтому дату подгоняем не размером, а форматом datestr: %a вместо %A даёт
-# строку примерно на ширину времени, а не вдвое шире его.
+#   дата  — indicator-radius / 6;
+#   verifying / wrong / cleared и индикатор раскладки — тоже font-size.
+# Поэтому крупные часы требуют и большего кольца: строка шириной больше
+# ≈ 0.73 × indicator-radius за него уже вылезает. 240 при 340 — время вдвое
+# крупнее прежнего, дата почти не изменилась, всё влезает в круг.
 
 indicator
 clock
+hide-keyboard-layout
 timestr=%H:%M
 datestr=%a, %-d %B
 font=Inter
-font-size=120
-indicator-radius=280
+font-size=240
+indicator-radius=340
 indicator-thickness=3
 scaling=fill
 
@@ -26,17 +29,19 @@ separator-color=00000000
 key-hl-color=00ff99
 bs-hl-color=ff0000
 
+# text-*-color прозрачные: слово verifying рисуется размером font-size и при
+# таких часах шире круга. Состояние и так читается по цвету кольца.
 ring-clear-color=ffffff
 inside-clear-color=00000066
-text-clear-color=ffffff
+text-clear-color=00000000
 line-clear-color=00000000
 
 ring-ver-color=00ff99
 inside-ver-color=00000066
-text-ver-color=00ff99
+text-ver-color=00000000
 line-ver-color=00000000
 
 ring-wrong-color=ff0000
 inside-wrong-color=00000066
-text-wrong-color=ff0000
+text-wrong-color=00000000
 line-wrong-color=00000000
