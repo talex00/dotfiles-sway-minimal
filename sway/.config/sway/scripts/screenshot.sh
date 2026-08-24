@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
-# Скриншот выделенной области: сохраняет в файл и копирует в буфер обмена.
+#!/bin/sh
+# Скриншот выделенной области: в файл и в буфер обмена.
 
-DIR="$HOME/Pictures/Screenshots"
-mkdir -p "$DIR"
-FILE="$DIR/Screenshot_$(date +%Y%m%d_%H%M%S).png"
+dir="$HOME/Pictures/Screenshots"
+file="$dir/Screenshot_$(date +%Y%m%d_%H%M%S).png"
 
-grim -g "$(slurp)" "$FILE" && wl-copy < "$FILE"
+mkdir -p "$dir"
+grim -g "$(slurp)" "$file" && wl-copy < "$file"

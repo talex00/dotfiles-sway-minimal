@@ -1,16 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# Выбор обоев: применяем сразу и запоминаем путь для следующего старта sway.
 
-WALLPAPER_DIR="$HOME/Pictures/Wallpapers"
-PERSIST_FILE="$HOME/.config/sway/wallpaper"
-SELECTED=$(ls "$WALLPAPER_DIR" | fuzzel --dmenu -p "Select Wallpaper: ")
+dir="$HOME/Pictures/Wallpapers"
+name=$(find "$dir" -maxdepth 1 -type f -printf '%P\n' | sort | fuzzel --dmenu -p 'Wallpaper: ')
+[ -n "$name" ] || exit 0
 
-if [ -n "$SELECTED" ]; then
-    FULL_PATH="$WALLPAPER_DIR/$SELECTED"
-
-    # 1. Сохраняем путь для применения при следующем запуске sway
-    echo "$FULL_PATH" > "$PERSIST_FILE"
-
-    # 2. Применяем немедленно: перезапускаем swaybg
-    pkill swaybg
-    swaybg -m fill -i "$FULL_PATH" &
-fi
+printf '%s\n' "$dir/$name" > "$HOME/.config/sway/wallpaper"
+pkill -x swaybg
+swaybg -m fill -i "$dir/$name" &

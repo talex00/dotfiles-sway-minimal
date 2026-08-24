@@ -1,0 +1,5 @@
+# runtime state, не коммитим
+sway/.config/sway/wallpaper
+sway/.config/sway/outputs
+fish/.config/fish/fish_variables
+fish/.config/fish/fish_history

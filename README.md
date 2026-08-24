@@ -1,104 +1,103 @@
-# Minimalist Sway Dotfiles
+# dotfiles-sway-minimal
 
-Конфигурационные файлы для создания минималистичного, светлого рабочего окружения на базе **Sway** (Wayland). Все настройки вынесены в этот репозиторий для удобного управления через GNU Stow.
+Минималистичное окружение на **Sway** (Wayland): светлая тема, нулевые гэпы, тонкие
+рамки и никакого лишнего кода в самих конфигах. Раскладывается через GNU Stow.
 
-## 🛠 Установленные компоненты и функции
-- **Оконный менеджер**: Sway
-- **Тайлинг**: autotiling (спиральный/dwindle-тайлинг — аналог Hyprland Dwindle)
-- **Терминал**: foot (быстрый Wayland-терминал)
-- **Файловый менеджер**: Thunar
-- **Панель состояния**: Waybar (вертикальная, слева)
-- **Лаунчер**: Fuzzel
-- **Уведомления**: mako
-- **Обои и блокировка**: swaybg, swayidle, swaylock
-- **Буфер обмена**: wl-clipboard + cliphist
-- **Цветовая температура**: gammastep
-- **Скриншоты**: grim + slurp
-- **Tray-апплеты**: nm-applet (сеть), blueman (bluetooth) — с правоклик-меню
-- **Уведомления батареи**: batsignal (легковесный демон мониторинга батареи)
-- **Настройка мониторов**: nwg-displays (GUI)
-- **Системная информация**: fastfetch
+## Стек
 
-## 🚀 Установка
+| Роль | Пакет |
+| --- | --- |
+| Оконный менеджер | sway + autotiling (спиральный split) |
+| Терминал | foot |
+| Панель | waybar (вертикальная, слева) |
+| Лаунчер и dmenu | fuzzel |
+| Уведомления | mako |
+| Блокировка, обои, idle | swaylock, swaybg, swayidle |
+| Файловый менеджер | Thunar |
+| Буфер обмена | wl-clipboard + cliphist |
+| Скриншоты | grim + slurp |
+| Цветовая температура | gammastep |
+| Батарея | batsignal |
+| Tray | nm-applet, blueman-applet |
+| Shell | fish + fastfetch |
 
-Для установки всех необходимых зависимостей выполните одну команду (потребуется AUR-помощник `yay`):
-
-```bash
-yay -S sway swaylock swayidle swaybg gammastep grim slurp \
-    waybar fuzzel foot thunar stow fastfetch \
-    wl-clipboard cliphist mako batsignal jq playerctl \
-    brightnessctl ddcutil network-manager-applet blueman nwg-displays autotiling
-```
-
-## 🔗 Применение конфигурации (Stow)
-
-Выполните из корня репозитория:
+## Установка
 
 ```bash
+yay -S sway swaylock swayidle swaybg autotiling waybar foot fuzzel mako thunar \
+    stow fish fastfetch grim slurp gammastep batsignal wl-clipboard cliphist \
+    jq playerctl brightnessctl ddcutil network-manager-applet blueman nwg-displays
+
 cd ~/dotfiles-sway-minimal
-stow sway
-stow foot
-stow fuzzel
-stow mako
-stow fish
-stow xfce
+chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
+stow sway foot fuzzel mako fish xfce
 ```
 
-Пакет `sway` за один раз раскладывает `~/.config/sway`, `~/.config/waybar` и `~/.config/swaylock`.
+Пакет `sway` раскладывает сразу `~/.config/sway`, `~/.config/waybar` и `~/.config/swaylock`.
 
-## 🖥 Мониторы
+## Горячие клавиши
 
-`~/.config/sway/monitors.conf` — **машинно-специфичный** файл. На новой машине отредактируйте его под свои выходы
-или сгенерируйте через GUI:
+| Клавиши | Действие |
+| --- | --- |
+| `Super + T` / `E` / `D` | терминал / файлы / лаунчер |
+| `Super + Q` / `F` | закрыть окно / полный экран |
+| `Super + B` / `P` | float / sticky |
+| `Super + V` | история буфера обмена |
+| `Super + W` | смена обоев |
+| `Super + N` | ночной режим (gammastep) |
+| `Super + L` | блокировка экрана |
+| `Super + ]` | меню скриптов |
+| `Super + Shift + S` | скриншот области в буфер |
+| `Super + Ctrl + S` | скриншот области в файл и буфер |
+| `Super + ←↑↓→` | фокус, с `Shift` — переместить окно |
+| `Super + 1…0` | воркспейс; `+Shift` — перенести окно, `+Ctrl` — перенести молча |
+| `Alt + Tab` | следующее окно |
+| `Super + Space` | раскладка us/ru |
+| `Ctrl + Alt + Del` | меню завершения сессии |
+| `Ctrl + Super + Alt + R` | reload sway и waybar |
+
+Буквенные и цифровые бинды объявлены с `--to-code`, поэтому работают в любой раскладке.
+
+## Мониторы
+
+`sway/.config/sway/monitors.conf` — машинно-специфичный файл, описывает только внешний
+`DP-1`. Встроенный `eDP-1` гасится или включается на старте скриптом
+`scripts/monitors-fallback.sh`, в зависимости от того, подключён ли внешний монитор.
 
 ```bash
-nwg-displays -o ~/.config/sway/monitors.conf   # расставить мышкой → Save
-swaymsg reload                                  # применить
+swaymsg -t get_outputs                          # имена выходов и режимы
+nwg-displays -o ~/.config/sway/monitors.conf    # расставить мышкой → Save
+swaymsg reload
 ```
 
-Имена выходов и доступные режимы:
+Для автоматики при док/отстыковке лучше поставить **kanshi** и описать профили —
+тогда `monitors-fallback.sh` можно удалить совсем.
 
-```bash
-swaymsg -t get_outputs
-```
+## Обои
 
-> ⚠️ Если в `monitors.conf` жёстко прописано `output eDP-1 disable`, то на ноутбуке без внешнего монитора будет
-> чёрный экран. Для автоматического переключения док/отстыковка установите **kanshi** и пропишите профили.
+Путь по умолчанию зашит в `config` (`~/Pictures/Wallpapers/frieren_meme.webp`) — замените
+на свой. `Super + W` открывает выбор из `~/Pictures/Wallpapers`; выбранный путь сохраняется
+в `~/.config/sway/wallpaper` и в git не попадает.
 
-## 🖼 Обои
+## Скрипты
 
-Путь к обоям по умолчанию зашит в `config` (`~/Pictures/Wallpapers/frieren_meme.webp`) — замените на свой.
-Сменить обои в рантайме: **Super + W** (fuzzel-меню выбора из `~/Pictures/Wallpapers`), выбранный путь
-сохраняется в `~/.config/sway/wallpaper` (в репозиторий не коммитится, см. `.gitignore`).
+`Super + ]` показывает плоский список `scripts/**/*.sh` через fuzzel. Скрипты из подпапок
+требуют sudo и поэтому запускаются в терминале.
 
-## ⌨️ Основные горячие клавиши
-- **Super + T** — терминал (foot)
-- **Super + E** — файловый менеджер (Thunar)
-- **Super + D** — лаунчер приложений (Fuzzel)
-- **Super + V** — буфер обмена (cliphist)
-- **Super + B** — переключение float/tiling для окна
-- **Super + F** — полноэкранный режим
-- **Super + Q** — закрыть активное окно
-- **Super + L** — блокировка экрана (swaylock)
-- **Super + N** — переключить ночной режим (gammastep)
-- **Super + W** — смена обоев
-- **Super + Shift + S** — скриншот области в буфер
-- **Super + Ctrl + S** — скриншот области в файл + буфер
-- **Super + Space** — переключение раскладки (us/ru)
-- **Ctrl + Alt + Delete** — меню завершения сессии
-- **Ctrl + Super + Alt + R** — перезагрузить Sway + Waybar
+| Скрипт | Что делает |
+| --- | --- |
+| `wallpaper.sh` | выбор и применение обоев |
+| `screenshot.sh` | скриншот области в файл и буфер |
+| `powermenu.sh` | logout / suspend / reboot / shutdown |
+| `brightness.sh up\|down` | яркость: brightnessctl для eDP-1, DDC/CI для внешнего |
+| `monitors-fallback.sh` | eDP-1 вкл/выкл по наличию DP-1 |
+| `power_management/power-profile.sh` | TDP + boost + EPP: eco / balanced / performance |
+| `power_management/toggle_health_mode.sh` | лимит заряда 80% (Acer WMI) |
 
-> Бинды с буквами/цифрами используют флаг `--to-code` — работают при любой раскладке (us/ru).
+## Заметки
 
-## ℹ️ Примечания
-- **Dwindle-тайлинг**: sway/i3 использует ручной split-тайлинг, встроенного dwindle (как в Hyprland) нет.
-  Спиральное поведение даёт демон **autotiling** — он чередует направление split по соотношению сторон.
-  Ручной override направления split — команда `swaymsg split toggle` (полного аналога
-  `preserve_split = true` в sway нет: autotiling переопределит выбор при следующем окне).
-- **Rounding, blur, inactive_opacity** — фичи Hyprland/SwayFX. В обычном Sway их нет; активное окно
-  подсвечивается цветной рамкой (`default_border pixel 2`, focused = голубой, inactive = серый).
-  Для полной визуальной паритета поставьте форк **SwayFX** (drop-in замена, конфиг совместим).
-- **Заголовок окна в waybar** отображается вертикально (по символу на строку) — GTK-waybar не поддерживает
-  CSS `transform: rotate()`. Межстрочный интервал сжат через `font-size` в `style.css`.
-- **Tray-иконки** (NetworkManager, Bluetooth) — это `nm-applet --indicator` и `blueman-applet`, регистрируются
-  в waybar-трее и дают правоклик-меню.
+- В sway нет dwindle-тайлинга — спираль даёт демон `autotiling`.
+- Скруглений, блюра и прозрачности в sway нет: активное окно видно по голубой рамке.
+  Нужны эффекты — поставьте **SwayFX**, конфиг совместим.
+- Заголовок окна в панели повёрнут штатным `"rotate": 90` (нужен waybar ≥ 0.10).
+  На более старой версии верните `custom/window` со скриптом.
