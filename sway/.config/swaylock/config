@@ -1,28 +1,42 @@
-# Светлый минималистичный экран блокировки.
-# Фон белый, рамка/текст чёрные, шрифт JetBrains Mono.
+# Экран блокировки: обои рабочего стола + круг-индикатор по центру.
+# Нужен swaylock-effects: indicator, clock, timestr, datestr — его опции.
+# Сами обои подставляет scripts/lock.sh: в конфиге нет подстановки команд.
 
-color=ffffff
-font=JetBrains Mono
-font-size=20
-indicator-radius=25
-indicator-thickness=2
-
-# Поле ввода
-inside-color=ffffff
-inside-clear-color=ffffff
-inside-ver-color=ffffff
-inside-wrong-color=ffffff
-ring-color=000000
-ring-clear-color=000000
-ring-ver-color=000000
-ring-wrong-color=ff0000
-key-hl-color=000000
-bs-hl-color=cc372c
-text-color=000000
-line-color=000000
-separator-color=000000
-
-# Часы
+indicator
+clock
 timestr=%H:%M
-datestr=
-clock-font-size=64
+datestr=%A, %-d %B
+font=Inter
+font-size=48
+indicator-radius=140
+indicator-thickness=3
+scaling=fill
+
+# Кольцо белое, внутри чёрный с большой прозрачностью — чтобы время
+# читалось на любых обоях. Прозрачность — последние две цифры: 66 ≈ 40%, 99 ≈ 60%.
+ring-color=ffffff
+inside-color=00000066
+text-color=ffffff
+line-color=00000000
+separator-color=00000000
+
+# Ввод — зелёный, стирание — красный.
+key-hl-color=00ff99
+bs-hl-color=ff0000
+
+# У swaylock нет наследования цветов: каждое состояние описывается целиком,
+# иначе вылезают дефолтные оранжевый и синий.
+ring-clear-color=ffffff
+inside-clear-color=00000066
+text-clear-color=ffffff
+line-clear-color=00000000
+
+ring-ver-color=00ff99
+inside-ver-color=00000066
+text-ver-color=00ff99
+line-ver-color=00000000
+
+ring-wrong-color=ff0000
+inside-wrong-color=00000066
+text-wrong-color=ff0000
+line-wrong-color=00000000

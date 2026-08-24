@@ -35,13 +35,13 @@ exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DE
 exec $scripts/monitors-fallback.sh
 
 # 10 мин → блокировка, +30 с → экран гаснет. Если залочено вручную (Super+L),
-# экран гаснет через 30 с. Sway сам locker не поднимает — зовём swaylock напрямую.
+# экран гаснет через 30 с. Sway сам locker не поднимает — зовём lock.sh напрямую.
 # Кавычки вокруг "*" обязательны: swayidle выполняет команды через sh -c.
 exec swayidle -w \
     timeout 30  'pgrep -x swaylock && swaymsg output "*" dpms off' resume 'swaymsg output "*" dpms on' \
-    timeout 600 'swaylock -f' \
+    timeout 600 '$scripts/lock.sh -f' \
     timeout 630 'swaymsg output "*" dpms off'                      resume 'swaymsg output "*" dpms on' \
-    before-sleep 'swaylock -f'
+    before-sleep '$scripts/lock.sh -f'
 
 
 # --- Look and feel ---
@@ -93,7 +93,7 @@ bindsym --to-code $mod+Q kill
 bindsym --to-code $mod+F fullscreen
 bindsym --to-code $mod+B floating toggle
 bindsym --to-code $mod+P sticky toggle
-bindsym --to-code $mod+L exec swaylock
+bindsym --to-code $mod+L exec $scripts/lock.sh
 bindsym --to-code $mod+N exec pkill gammastep || gammastep -O 4500
 bindsym --to-code $mod+V exec cliphist list | $menu --dmenu | cliphist decode | wl-copy
 bindsym --to-code $mod+W exec $scripts/wallpaper.sh
@@ -102,6 +102,12 @@ bindsym --to-code $mod+Shift+S exec grim -g "$(slurp)" - | wl-copy
 bindsym --to-code $mod+Ctrl+S exec $scripts/screenshot.sh
 bindsym --to-code Ctrl+$mod+Mod1+R reload
 bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
+
+# Handy (диктовка): на Wayland приложение не может перехватить глобальный
+# хоткей само, поэтому комбинацию держит sway и переключает запись сигналом
+# (так советует сам Handy). --to-code не нужен: Super_L — модификатор, не буква.
+# В настройках Handy нужен режим toggle, а не push-to-talk.
+bindsym Ctrl+Super_L exec pkill -USR2 -x handy
 
 floating_modifier $mod normal
 

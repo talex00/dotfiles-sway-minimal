@@ -12,28 +12,32 @@
 | Панель | waybar (вертикальная, слева) |
 | Лаунчер и dmenu | fuzzel |
 | Уведомления | mako |
-| Блокировка, обои, idle | swaylock, swaybg, swayidle |
+| Блокировка, обои, idle | swaylock-effects, swaybg, swayidle |
 | Файловый менеджер | Thunar |
 | Буфер обмена | wl-clipboard + cliphist |
 | Скриншоты | grim + slurp |
 | Цветовая температура | gammastep |
 | Батарея | batsignal |
+| Диктовка | Handy (хоткей держит sway) |
 | Tray | nm-applet, blueman-applet |
 | Shell | fish + fastfetch |
 
 ## Установка
 
 ```bash
-yay -S sway swaylock swayidle swaybg autotiling waybar foot fuzzel mako thunar \
-    stow fish fastfetch grim slurp gammastep batsignal wl-clipboard cliphist \
-    jq playerctl brightnessctl ddcutil network-manager-applet blueman nwg-displays
+yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel mako \
+    thunar stow fish fastfetch grim slurp gammastep batsignal wl-clipboard \
+    cliphist jq playerctl brightnessctl ddcutil network-manager-applet blueman \
+    nwg-displays inter-font
 
 cd ~/dotfiles-sway-minimal
 chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
 stow sway foot fuzzel mako fish xfce
 ```
 
-Пакет `sway` раскладывает сразу `~/.config/sway`, `~/.config/waybar` и `~/.config/swaylock`.
+`swaylock-effects` заменяет обычный `swaylock` — менеджер пакетов предложит замену,
+это ожидаемо. Пакет `sway` раскладывает сразу `~/.config/sway`, `~/.config/waybar`
+и `~/.config/swaylock`.
 
 ## Горячие клавиши
 
@@ -47,6 +51,7 @@ stow sway foot fuzzel mako fish xfce
 | `Super + N` | ночной режим (gammastep) |
 | `Super + L` | блокировка экрана |
 | `Super + ]` | меню скриптов |
+| `Ctrl + Super` | диктовка: вкл/выкл запись в Handy |
 | `Super + Shift + S` | скриншот области в буфер |
 | `Super + Ctrl + S` | скриншот области в файл и буфер |
 | `Super + ←↑↓→` | фокус, с `Shift` — переместить окно |
@@ -57,6 +62,39 @@ stow sway foot fuzzel mako fish xfce
 | `Ctrl + Super + Alt + R` | reload sway и waybar |
 
 Буквенные и цифровые бинды объявлены с `--to-code`, поэтому работают в любой раскладке.
+
+## Экран блокировки
+
+Обои те же, что на рабочем столе, без блюра и прочих эффектов. По центру тонкое белое
+кольцо, внутри — чёрный с большой прозрачностью, чтобы время читалось на любой
+картинке. Время большое, дата под ним мельче. Ввод символа подсвечивается зелёным,
+стирание — красным.
+
+Путь к обоям в конфиг swaylock не прописать: там нет ни подстановки команд, ни
+раскрытия `~`. Поэтому блокировка идёт через `scripts/lock.sh`: он читает тот же
+`~/.config/sway/wallpaper`, что и swaybg, и передаёт картинку в `swaylock -i`.
+
+Тонкая настройка в `sway/.config/swaylock/config`:
+
+- размер времени — `font-size`;
+- размер даты swaylock-effects считает от `indicator-radius` и отдельно его не задать;
+- прозрачность круга — последние две цифры в `inside-color` (`66` ≈ 40%, `99` ≈ 60%).
+
+Шрифт часов — `Inter` (пакет `inter-font`). Если не хочется лишнего шрифта в системе —
+поменяйте `font=Inter` на `font=JetBrains Mono`.
+
+## Диктовка (Handy)
+
+Wayland не даёт приложениям перехватывать глобальные хоткеи, поэтому комбинацию
+держит sway и переключает запись сигналом — так советует сама документация Handy:
+
+```
+bindsym Ctrl+Super_L exec pkill -USR2 -x handy
+```
+
+В настройках Handy нужен режим toggle, а не push-to-talk: сигнал именно переключает
+запись, а не держит её. Альтернатива сигналу — `handy --toggle-transcription`, но она
+медленнее: каждый раз поднимается ещё один процесс.
 
 ## Мониторы
 
@@ -77,7 +115,7 @@ swaymsg reload
 
 Путь по умолчанию зашит в `config` (`~/Pictures/Wallpapers/frieren_meme.webp`) — замените
 на свой. `Super + W` открывает выбор из `~/Pictures/Wallpapers`; выбранный путь сохраняется
-в `~/.config/sway/wallpaper` и в git не попадает.
+в `~/.config/sway/wallpaper`, в git не попадает и подхватывается экраном блокировки.
 
 ## Скрипты
 
@@ -86,6 +124,7 @@ swaymsg reload
 
 | Скрипт | Что делает |
 | --- | --- |
+| `lock.sh` | блокировка теми же обоями, что на рабочем столе |
 | `wallpaper.sh` | выбор и применение обоев |
 | `screenshot.sh` | скриншот области в файл и буфер |
 | `powermenu.sh` | logout / suspend / reboot / shutdown |
@@ -101,3 +140,6 @@ swaymsg reload
   Нужны эффекты — поставьте **SwayFX**, конфиг совместим.
 - Заголовок окна в панели повёрнут штатным `"rotate": 90` (нужен waybar ≥ 0.10).
   На более старой версии верните `custom/window` со скриптом.
+- `Ctrl + Super` срабатывает по нажатию Super при зажатом Ctrl, поэтому при наборе
+  `Ctrl + Super + Alt + R` диктовка тоже дёргается. Нажмите ещё раз, чтобы выключить,
+  или перевешайте reload на другую комбинацию.
