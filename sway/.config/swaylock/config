@@ -14,9 +14,9 @@ clock
 timestr=%H:%M
 datestr=%a, %-d %B
 font=Inter
-font-size=155
-indicator-radius=300
-indicator-thickness=3
+font-size=240
+indicator-radius=280
+indicator-thickness=10
 scaling=fill
 
 ring-color=ffffff
