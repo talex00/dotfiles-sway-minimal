@@ -69,18 +69,19 @@ generate() {
 
     # waybar: цвета — theme.css (импорт из style.css), режим панели —
     # margins в state.json (include из config.jsonc) и ободок в state.css.
-    # floating: отступы = gaps, чтобы верх и низ панели были вровень с окнами.
+    # floating: сверху и снизу отступы = gaps (верх и низ вровень с окнами),
+    # слева — фиксированные 8, как было изначально.
     cp "$themes/$theme/waybar.css" "$HOME/.config/waybar/theme.css"
     if [ "$bar" = floating ]; then
         printf 'window#waybar {\n    border: 2px solid @accent;\n}\n' \
             > "$HOME/.config/waybar/state.css"
-        m=$gaps
+        mtb=$gaps; ml=8
     else
         : > "$HOME/.config/waybar/state.css"
-        m=0
+        mtb=0; ml=0
     fi
     printf '{ "margin-top": %s, "margin-bottom": %s, "margin-left": %s }\n' \
-        "$m" "$m" "$m" > "$HOME/.config/waybar/state.json"
+        "$mtb" "$mtb" "$ml" > "$HOME/.config/waybar/state.json"
 
     cp "$themes/$theme/fuzzel.ini" "$HOME/.config/fuzzel/theme.ini"
     cp "$themes/$theme/mako"       "$HOME/.config/mako/theme"
@@ -182,7 +183,7 @@ case ${1:-menu} in
                 # воркспейсы могут остаться со старыми отступами. Форма
                 # all set применяется ко всем воркспейсам и сразу.
                 swaymsg "gaps inner all set $new"
-                # margins floating-панели равны gaps — перечитать state.json
+                # margins floating-панели зависят от gaps — перечитать state.json
                 pkill -SIGUSR2 waybar
                 ;;
             Bar:*)
