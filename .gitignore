@@ -7,3 +7,18 @@ fish/.config/fish/fish_history
 # Именно эти два файла по умолчанию пишет nwg-displays.
 sway/.config/sway/outputs
 sway/.config/sway/workspaces
+
+# Внешний вид: выбор и сгенерированные state-файлы (scripts/look.sh)
+sway/.config/sway/theme
+sway/.config/sway/border
+sway/.config/sway/smart-borders
+sway/.config/sway/gaps
+sway/.config/sway/bar-mode
+sway/.config/sway/look
+sway/.config/waybar/theme.css
+sway/.config/waybar/state.json
+sway/.config/waybar/state.css
+sway/.config/swaylock/theme-colors
+fuzzel/.config/fuzzel/theme.ini
+mako/.config/mako/theme
+foot/.config/foot/theme.ini

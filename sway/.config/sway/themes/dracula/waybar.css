@@ -1,0 +1,32 @@
+/* Dracula. */
+@define-color accent #bd93f9;
+
+window#waybar {
+    background: #282a36;
+    color: #f8f8f2;
+}
+
+#workspaces button {
+    color: #6272a4;
+}
+
+#workspaces button.focused {
+    color: #f8f8f2;
+}
+
+#workspaces button.urgent {
+    color: #ff5555;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #50fa7b;
+}
+
+#battery.critical:not(.charging) {
+    color: #ff5555;
+}
+
+@keyframes blink {
+    to { color: #f8f8f2; }
+}

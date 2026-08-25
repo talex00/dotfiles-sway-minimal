@@ -4,6 +4,11 @@
     "width": 25,
     "spacing": 4,
 
+    // Режим панели (edge/floating): margins живут в state.json, его пишет
+    // scripts/look.sh. Здесь их не задавать: при дубле побеждает первое
+    // определение, а это оно.
+    "include": "~/.config/waybar/state.json",
+
     "modules-left": ["sway/workspaces"],
     "modules-center": ["sway/window"],
     "modules-right": ["sway/language", "tray", "pulseaudio", "clock", "battery"],
