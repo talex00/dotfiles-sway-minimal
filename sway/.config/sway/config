@@ -70,10 +70,13 @@ focus_follows_mouse always
 mouse_warping none
 
 #                       border  background text    indicator child_border
-client.focused          #33ccff #33ccff    #ffffff #00ff99   #33ccff
+client.focused          #33ccff #33ccff    #ffffff #33ccff   #33ccff
 client.focused_inactive #595959 #595959    #ffffff #595959   #595959
 client.unfocused        #595959 #595959    #ffffff #595959   #595959
 client.urgent           #ff0000 #ff0000    #ffffff #ff0000   #ff0000
+
+# indicator = border: полоса «куда откроется следующее окно» отключена —
+# отдельной опции у sway нет, а с gaps она выглядит как грань чужого цвета.
 
 # Тема, толщина рамки и gaps подключаются из генерируемого файла (его пишет
 # scripts/look.sh, в git он не лежит). Глоб, как с outputs/workspaces выше:
