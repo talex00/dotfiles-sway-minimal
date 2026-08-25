@@ -11,6 +11,10 @@
 #   mako   — makoctl reload
 #   foot   — SIGUSR1 (тёмная тема) / SIGUSR2 (светлая): переключает все окна
 #   fuzzel и swaylock — ничего: конфиг читается при каждом запуске
+#   GTK    — gsettings color-scheme (портал, libadwaita) + settings.ini
+#            (GTK3/4 на Wayland без xsettingsd читают только его)
+#   Qt     — ничего: системную тему на sway Qt не видит (QTBUG-141102);
+#            у Happ своя: Настройки → Тема
 #
 # Без аргументов — меню. `ensure` — создать недостающие state-файлы;
 # зовётся из автозапуска sway, до старта waybar и первого fuzzel/foot.
@@ -26,6 +30,24 @@ f_bar="$HOME/.config/sway/bar-mode"
 get() { cat "$1" 2>/dev/null || printf '%s\n' "$2"; }
 
 theme_family() { cat "$themes/$(get "$f_theme" default)/family" 2>/dev/null || printf 'light\n'; }
+
+# GTK3/4 на Wayland без xsettingsd читают не gsettings, а settings.ini.
+# Правим ровно два ключа в группе [Settings], остальное в файле сохраняем.
+gtk_theme_ini() { # $1 = версия (3.0/4.0), $2 = тема, $3 = prefer-dark (true/false)
+    ini="$HOME/.config/gtk-$1/settings.ini"
+    mkdir -p "${ini%/*}"
+    [ -f "$ini" ] || printf '[Settings]\n' > "$ini"
+    awk -v theme="$2" -v dark="$3" '
+        /^\[Settings\]/ { in_s=1; print; next }
+        /^\[/ { if (in_s && !done) { print "gtk-theme-name=" theme; print "gtk-application-prefer-dark-theme=" dark; done=1; in_s=0 } print; next }
+        in_s && /^(gtk-theme-name|gtk-application-prefer-dark-theme)=/ { next }
+        { print }
+        END {
+            if (in_s && !done) { print "gtk-theme-name=" theme; print "gtk-application-prefer-dark-theme=" dark; done=1 }
+            if (!done) { print ""; print "[Settings]"; print "gtk-theme-name=" theme; print "gtk-application-prefer-dark-theme=" dark }
+        }
+    ' "$ini" > "$ini.tmp" && mv "$ini.tmp" "$ini"
+}
 
 # Собирает все state-файлы из текущего выбора. Сам ничего не перезагружает.
 generate() {
@@ -60,17 +82,19 @@ generate() {
     cp "$themes/$theme/foot.ini"   "$HOME/.config/foot/theme.ini"
     cp "$themes/$theme/swaylock"   "$HOME/.config/swaylock/theme-colors"
 
-    # GTK: color-scheme читают libadwaita и xdg-портал, gtk-theme — GTK3
-    # (Thunar и компания). Схемы может не быть — тогда просто пропускаем.
-    if command -v gsettings >/dev/null 2>&1; then
-        if [ "$(theme_family)" = dark ]; then
-            gsettings set org.gnome.desktop.interface color-scheme prefer-dark 2>/dev/null
-            gsettings set org.gnome.desktop.interface gtk-theme Adwaita-dark 2>/dev/null
-        else
-            gsettings set org.gnome.desktop.interface color-scheme prefer-light 2>/dev/null
-            gsettings set org.gnome.desktop.interface gtk-theme Adwaita 2>/dev/null
-        fi
+    # GTK: color-scheme читают libadwaita и xdg-портал (браузеры), а GTK3/4
+    # на Wayland без xsettingsd — только settings.ini. Пишем оба канала.
+    if [ "$(theme_family)" = dark ]; then
+        scheme=prefer-dark; gtk=Adwaita-dark; prefer=true
+    else
+        scheme=prefer-light; gtk=Adwaita; prefer=false
     fi
+    if command -v gsettings >/dev/null 2>&1; then
+        gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null
+        gsettings set org.gnome.desktop.interface gtk-theme "$gtk" 2>/dev/null
+    fi
+    gtk_theme_ini 3.0 "$gtk" "$prefer"
+    gtk_theme_ini 4.0 "$gtk" "$prefer"
 }
 
 reload() {
