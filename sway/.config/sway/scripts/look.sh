@@ -9,7 +9,8 @@
 #            точечными swaymsg (gaps через reload подхватываются не всегда)
 #   waybar — SIGUSR2: перечитывает и config (margins из state.json), и css
 #   mako   — makoctl reload
-#   foot   — SIGUSR1 (тёмная тема) / SIGUSR2 (светлая): переключает все окна
+#   foot   — SIGUSR1 (тёмная) / SIGUSR2 (светлая): theme.ini собирается из
+#            палитр всех тем сразу, поэтому все окна переключаются мгновенно
 #   fuzzel и swaylock — ничего: конфиг читается при каждом запуске
 #   GTK    — gsettings color-scheme (портал, libadwaita, браузеры) +
 #            settings.ini для GTK3/4; тёмность — вариантом prefer-dark при
@@ -32,7 +33,8 @@ f_bar="$HOME/.config/sway/bar-mode"
 # state-файл или дефолт (ice), если его ещё нет
 get() { cat "$1" 2>/dev/null || printf '%s\n' "$2"; }
 
-theme_family() { cat "$themes/$(get "$f_theme" ice)/family" 2>/dev/null || printf 'light\n'; }
+family_of() { cat "$themes/$1/family" 2>/dev/null || printf 'light\n'; }
+theme_family() { family_of "$(get "$f_theme" ice)"; }
 
 # GTK3/4 на Wayland без xsettingsd читают не gsettings, а settings.ini.
 # Правим ровно два ключа в группе [Settings], остальное в файле сохраняем.
@@ -56,6 +58,7 @@ gtk_theme_ini() { # $1 = версия (3.0/4.0), $2 = тема, $3 = prefer-dark
 generate() {
     theme=$(get "$f_theme" ice)
     [ -d "$themes/$theme" ] || theme=ice
+    family=$(family_of "$theme")
     border=$(get "$f_border" 2)
     smart=$(get "$f_smart" on)
     gaps=$(get "$f_gaps" 0)
@@ -85,14 +88,26 @@ generate() {
 
     cp "$themes/$theme/fuzzel.ini" "$HOME/.config/fuzzel/theme.ini"
     cp "$themes/$theme/mako"       "$HOME/.config/mako/theme"
-    cp "$themes/$theme/foot.ini"   "$HOME/.config/foot/theme.ini"
+
+    # foot не перечитывает конфиг и держит ровно два слота ([colors-dark] и
+    # [colors-light]); сигналы переключают только между палитрами, загруженными
+    # при старте. Поэтому theme.ini собираем из палитр ВСЕХ тем сразу, иначе
+    # живое переключение показывало бы встроенные дефолты. Стартовую палитру
+    # новых окон задаёт initial-color-theme текущей темы.
+    {
+        printf 'initial-color-theme=%s\n\n' "$family"
+        for t in "$themes"/*; do
+            [ -f "$t/foot.ini" ] && cat "$t/foot.ini" && printf '\n'
+        done
+    } > "$HOME/.config/foot/theme.ini"
+
     cp "$themes/$theme/swaylock"   "$HOME/.config/swaylock/theme-colors"
 
     # GTK: color-scheme читают libadwaita и xdg-портал (браузеры), GTK3/4 —
     # gtk-theme-name + prefer-dark (settings.ini и gsettings). Тёмность —
     # вариантом встроенной Adwaita, как у самого GNOME: темы с именем
     # Adwaita-dark может не быть (она в gnome-themes-extra).
-    if [ "$(theme_family)" = dark ]; then
+    if [ "$family" = dark ]; then
         scheme=prefer-dark; prefer=true
     else
         scheme=prefer-light; prefer=false
@@ -109,9 +124,6 @@ reload() {
     swaymsg reload >/dev/null 2>&1
     pkill -SIGUSR2 waybar
     makoctl reload 2>/dev/null
-    # foot держит две палитры (dark/light) и не умеет перечитывать конфиг:
-    # переход тёмная↔светлая перекрашивает все окна сигналом, а смена темы
-    # внутри одного семейства — только новые окна.
     if [ "$(theme_family)" = dark ]; then
         pkill -USR1 -x foot
     else
