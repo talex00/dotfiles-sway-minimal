@@ -1,6 +1,0 @@
-# Светлая пастельная. Палитра — Catppuccin Latte.
-# indicator = border: полоса направления сплита отключена.
-client.focused          #7287fd #7287fd #ffffff #7287fd #7287fd
-client.focused_inactive #bcc0cc #bcc0cc #6c6f85 #bcc0cc #bcc0cc
-client.unfocused        #bcc0cc #bcc0cc #6c6f85 #bcc0cc #bcc0cc
-client.urgent           #d20f39 #d20f39 #ffffff #d20f39 #d20f39
