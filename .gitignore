@@ -1,8 +1,9 @@
 # runtime state, не коммитим
 sway/.config/sway/wallpaper
-sway/.config/sway/outputs
 fish/.config/fish/fish_variables
 fish/.config/fish/fish_history
 
-# машинно-специфичное: выходы у каждой системы свои
-sway/.config/sway/monitors.conf
+# Машинно-специфичное: выходы и привязка воркспейсов у каждой системы свои.
+# Именно эти два файла по умолчанию пишет nwg-displays.
+sway/.config/sway/outputs
+sway/.config/sway/workspaces

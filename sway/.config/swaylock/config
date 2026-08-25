@@ -1,22 +1,21 @@
 # swaylock-effects. Обои те же, что на рабочем столе, — их подставляет
 # scripts/lock.sh, потому что в этом конфиге нет ни подстановки команд, ни ~.
 #
-# Размеры связаны жёстко, отдельной опции для даты в swaylock-effects нет:
-#   время — font-size;
-#   дата  — indicator-radius / 6;
-#   verifying / wrong / cleared и индикатор раскладки — тоже font-size.
-# Поэтому крупные часы требуют и большего кольца: строка шириной больше
-# ≈ 0.73 × indicator-radius за него уже вылезает. 240 при 340 — время вдвое
-# крупнее прежнего, дата почти не изменилась, всё влезает в круг.
+# Размеры связаны жёстко, отдельной опции для даты не существует:
+#   время — font-size (155);
+#   дата  — indicator-radius / 6, то есть ≈ 50;
+#   бокс раскладки и надписи verifying / wrong / cleared — тоже font-size.
+# Бокс раскладки рисуется под кольцом и только во время ввода пароля,
+# поэтому его ширина часам не мешает. А вот verifying рисуется внутри круга и
+# при таком кегле шире него — поэтому он скрыт прозрачным цветом.
 
 indicator
 clock
-hide-keyboard-layout
 timestr=%H:%M
 datestr=%a, %-d %B
 font=Inter
-font-size=240
-indicator-radius=340
+font-size=155
+indicator-radius=300
 indicator-thickness=3
 scaling=fill
 
@@ -29,8 +28,13 @@ separator-color=00000000
 key-hl-color=00ff99
 bs-hl-color=ff0000
 
+# Бокс текущей раскладки под кольцом: та же подложка и белый текст, без рамки.
+layout-bg-color=00000066
+layout-border-color=00000000
+layout-text-color=ffffff
+
 # text-*-color прозрачные: слово verifying рисуется размером font-size и при
-# таких часах шире круга. Состояние и так читается по цвету кольца.
+# таких часах вылезает за круг. Состояние и так читается по цвету кольца.
 ring-clear-color=ffffff
 inside-clear-color=00000066
 text-clear-color=00000000
