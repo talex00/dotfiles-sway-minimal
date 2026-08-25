@@ -5,7 +5,8 @@
 # текущий выбор — в state-файлах рядом с конфигами (в git не попадают, как
 # wallpaper). Применение = пересобрать state-файлы из темы и разослать
 # сигналы перезагрузки:
-#   sway   — swaymsg reload (цвета, рамка, gaps — один генерируемый look)
+#   sway   — swaymsg reload для цветов темы; рамка и gaps — точечными swaymsg
+#            (gaps через reload подхватываются не всегда, см. ниже)
 #   waybar — SIGUSR2: перечитывает и config (margins из state.json), и css
 #   mako   — makoctl reload
 #   foot   — SIGUSR1 (тёмная тема) / SIGUSR2 (светлая): переключает все окна
@@ -115,17 +116,29 @@ case ${1:-menu} in
                 new=${new#\* }
                 [ -d "$themes/$new" ] || exit 0
                 printf '%s\n' "$new" > "$f_theme"
+                generate
+                reload
                 ;;
             Border:*)
                 # dmenu возвращает и набранный вручную текст — любое число годится
                 new=$(printf '0\n1\n2\n3\n4\n' | fuzzel --dmenu -p 'Border px: ')
                 case $new in '' | *[!0-9]*) exit 0 ;; esac
                 printf '%s\n' "$new" > "$f_border"
+                generate
+                # Полный reload избыточен (зря перезапускает waybar через
+                # exec_always): рамка применяется мгновенно сама по себе,
+                # а look-файл нужен только будущим стартам sway.
+                swaymsg "default_border pixel $new; default_floating_border pixel $new"
                 ;;
             Gaps:*)
                 new=$(printf '0\n4\n8\n12\n' | fuzzel --dmenu -p 'Gaps px: ')
                 case $new in '' | *[!0-9]*) exit 0 ;; esac
                 printf '%s\n' "$new" > "$f_gaps"
+                generate
+                # gaps через reload подхватываются не всегда: уже открытые
+                # воркспейсы могут остаться со старыми отступами. Форма
+                # all set применяется ко всем воркспейсам и сразу.
+                swaymsg "gaps inner all set $new"
                 ;;
             Bar:*)
                 current=$(get "$f_bar" edge)
@@ -134,12 +147,12 @@ case ${1:-menu} in
                 new=${new#\* }
                 case $new in edge | floating) ;; *) exit 0 ;; esac
                 printf '%s\n' "$new" > "$f_bar"
+                generate
+                reload
                 ;;
             *)
                 exit 0
                 ;;
         esac
-        generate
-        reload
         ;;
 esac
