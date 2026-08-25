@@ -1,0 +1,32 @@
+/* Тема ice — светлая. @accent использует state.css (ободок floating-панели). */
+@define-color accent #33ccff;
+
+window#waybar {
+    background: #ffffff;
+    color: #000000;
+}
+
+#workspaces button {
+    color: #888888;
+}
+
+#workspaces button.focused {
+    color: #000000;
+}
+
+#workspaces button.urgent {
+    color: #ff0000;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #2ecc71;
+}
+
+#battery.critical:not(.charging) {
+    color: #f53c3c;
+}
+
+@keyframes blink {
+    to { color: #000000; }
+}

@@ -1,0 +1,14 @@
+# Цвета совпадают с базовым swaylock/config (он остаётся фолбэком).
+ring-color=ffffff
+inside-color=00000066
+text-color=ffffff
+key-hl-color=00ff99
+bs-hl-color=ff0000
+layout-bg-color=00000066
+layout-text-color=ffffff
+ring-clear-color=ffffff
+inside-clear-color=00000066
+ring-ver-color=00ff99
+inside-ver-color=00000066
+ring-wrong-color=ff0000
+inside-wrong-color=00000066

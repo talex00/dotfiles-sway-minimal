@@ -29,10 +29,10 @@ f_smart="$HOME/.config/sway/smart-borders"
 f_gaps="$HOME/.config/sway/gaps"
 f_bar="$HOME/.config/sway/bar-mode"
 
-# state-файл или дефолт, если его ещё нет
+# state-файл или дефолт (ice), если его ещё нет
 get() { cat "$1" 2>/dev/null || printf '%s\n' "$2"; }
 
-theme_family() { cat "$themes/$(get "$f_theme" default)/family" 2>/dev/null || printf 'light\n'; }
+theme_family() { cat "$themes/$(get "$f_theme" ice)/family" 2>/dev/null || printf 'light\n'; }
 
 # GTK3/4 на Wayland без xsettingsd читают не gsettings, а settings.ini.
 # Правим ровно два ключа в группе [Settings], остальное в файле сохраняем.
@@ -54,8 +54,8 @@ gtk_theme_ini() { # $1 = версия (3.0/4.0), $2 = тема, $3 = prefer-dark
 
 # Собирает все state-файлы из текущего выбора. Сам ничего не перезагружает.
 generate() {
-    theme=$(get "$f_theme" default)
-    [ -d "$themes/$theme" ] || theme=default
+    theme=$(get "$f_theme" ice)
+    [ -d "$themes/$theme" ] || theme=ice
     border=$(get "$f_border" 2)
     smart=$(get "$f_smart" on)
     gaps=$(get "$f_gaps" 0)
@@ -127,11 +127,11 @@ case ${1:-menu} in
         if [ ! -f "$f_theme" ] || [ ! -f "$f_border" ] || [ ! -f "$f_smart" ] ||
            [ ! -f "$f_gaps" ] || [ ! -f "$f_bar" ] ||
            [ ! -f "$HOME/.config/sway/look" ]; then
-            [ -f "$f_theme" ]  || printf 'default\n' > "$f_theme"
-            [ -f "$f_border" ] || printf '2\n'       > "$f_border"
-            [ -f "$f_smart" ]  || printf 'on\n'      > "$f_smart"
-            [ -f "$f_gaps" ]   || printf '0\n'       > "$f_gaps"
-            [ -f "$f_bar" ]    || printf 'edge\n'    > "$f_bar"
+            [ -f "$f_theme" ]  || printf 'ice\n' > "$f_theme"
+            [ -f "$f_border" ] || printf '2\n'    > "$f_border"
+            [ -f "$f_smart" ]  || printf 'on\n'   > "$f_smart"
+            [ -f "$f_gaps" ]   || printf '0\n'    > "$f_gaps"
+            [ -f "$f_bar" ]    || printf 'edge\n' > "$f_bar"
             generate
             # конфиг sway уже прочитан к моменту exec — подхватить look
             pgrep -x sway >/dev/null && swaymsg reload
@@ -139,12 +139,12 @@ case ${1:-menu} in
         ;;
     menu)
         choice=$(printf 'Theme: %s\nBorder: %s px\nSmart borders: %s\nGaps: %s px\nBar: %s\n' \
-            "$(get "$f_theme" default)" "$(get "$f_border" 2)" \
+            "$(get "$f_theme" ice)" "$(get "$f_border" 2)" \
             "$(get "$f_smart" on)" "$(get "$f_gaps" 0)" "$(get "$f_bar" edge)" |
             fuzzel --dmenu -p 'Look: ')
         case $choice in
             Theme:*)
-                current=$(get "$f_theme" default)
+                current=$(get "$f_theme" ice)
                 new=$(ls "$themes" | sed "s/^$current\$/* $current/" |
                     fuzzel --dmenu -p 'Theme: ')
                 new=${new#\* }
