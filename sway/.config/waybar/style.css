@@ -1,3 +1,11 @@
+/* Цвета — в theme.css (тема, пишет scripts/look.sh), ободок floating-панели —
+   в state.css. @import допустим только до остальных правил, поэтому эти две
+   строки стоят первыми, а сам файл держит лишь структуру: шрифт, отступы,
+   поведение. Без theme.css панель просто остаётся бесцветной до первого
+   запуска look.sh ensure — он есть в автозапуске sway. */
+@import url("theme.css");
+@import url("state.css");
+
 * {
     border: none;
     border-radius: 0;
@@ -7,23 +15,12 @@
     min-height: 0;
 }
 
-window#waybar {
-    background: #ffffff;
-    color: #000000;
-}
-
 #workspaces button {
     padding: 2px 0;
-    color: #888888;
 }
 
 #workspaces button.focused {
-    color: #000000;
     font-weight: bold;
-}
-
-#workspaces button.urgent {
-    color: #ff0000;
 }
 
 #window,
@@ -35,16 +32,6 @@ window#waybar {
     padding: 2px 0;
 }
 
-#battery.charging,
-#battery.plugged {
-    color: #2ecc71;
-}
-
 #battery.critical:not(.charging) {
-    color: #f53c3c;
     animation: blink 0.5s linear infinite alternate;
-}
-
-@keyframes blink {
-    to { color: #000000; }
 }

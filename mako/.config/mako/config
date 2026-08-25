@@ -8,3 +8,7 @@ height=100
 margin=10
 padding=15
 default-timeout=5000
+
+# Цвета темы (пишет scripts/look.sh). include стоит последним и переопределяет
+# значения выше — они остаются фолбэком для свежей системы.
+include=~/.config/mako/theme
