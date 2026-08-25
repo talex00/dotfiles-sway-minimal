@@ -1,12 +1,12 @@
 #!/bin/sh
-# Меню внешнего вида: тема, толщина рамки, gaps, режим панели.
+# Меню внешнего вида: тема, толщина рамки, smart_borders, gaps, режим панели.
 #
 # Темы — данные, а не правки конфигов: палитры лежат в git (themes/<имя>/),
 # текущий выбор — в state-файлах рядом с конфигами (в git не попадают, как
 # wallpaper). Применение = пересобрать state-файлы из темы и разослать
 # сигналы перезагрузки:
-#   sway   — swaymsg reload для цветов темы; рамка и gaps — точечными swaymsg
-#            (gaps через reload подхватываются не всегда, см. ниже)
+#   sway   — swaymsg reload для цветов темы; рамка, smart_borders и gaps —
+#            точечными swaymsg (gaps через reload подхватываются не всегда)
 #   waybar — SIGUSR2: перечитывает и config (margins из state.json), и css
 #   mako   — makoctl reload
 #   foot   — SIGUSR1 (тёмная тема) / SIGUSR2 (светлая): переключает все окна
@@ -25,6 +25,7 @@ themes="$HOME/.config/sway/themes"
 
 f_theme="$HOME/.config/sway/theme"
 f_border="$HOME/.config/sway/border"
+f_smart="$HOME/.config/sway/smart-borders"
 f_gaps="$HOME/.config/sway/gaps"
 f_bar="$HOME/.config/sway/bar-mode"
 
@@ -56,14 +57,15 @@ generate() {
     theme=$(get "$f_theme" default)
     [ -d "$themes/$theme" ] || theme=default
     border=$(get "$f_border" 2)
+    smart=$(get "$f_smart" on)
     gaps=$(get "$f_gaps" 0)
     bar=$(get "$f_bar" edge)
 
     # sway: один генерируемый файл; include'ится после базовых значений
     # и поэтому переопределяет их.
     cat "$themes/$theme/sway" > "$HOME/.config/sway/look"
-    printf 'default_border pixel %s\ndefault_floating_border pixel %s\ngaps inner %s\n' \
-        "$border" "$border" "$gaps" >> "$HOME/.config/sway/look"
+    printf 'default_border pixel %s\ndefault_floating_border pixel %s\nsmart_borders %s\ngaps inner %s\n' \
+        "$border" "$border" "$smart" "$gaps" >> "$HOME/.config/sway/look"
 
     # waybar: цвета — theme.css (импорт из style.css), режим панели —
     # margins в state.json (include из config.jsonc) и ободок в state.css.
@@ -120,10 +122,12 @@ case ${1:-menu} in
     ensure)
         # Без state-файлов include'ы fuzzel/foot/waybar ругались бы. Всё на
         # месте — выходим сразу: ensure есть в автозапуске каждой сессии.
-        if [ ! -f "$f_theme" ] || [ ! -f "$f_border" ] || [ ! -f "$f_gaps" ] ||
-           [ ! -f "$f_bar" ] || [ ! -f "$HOME/.config/sway/look" ]; then
+        if [ ! -f "$f_theme" ] || [ ! -f "$f_border" ] || [ ! -f "$f_smart" ] ||
+           [ ! -f "$f_gaps" ] || [ ! -f "$f_bar" ] ||
+           [ ! -f "$HOME/.config/sway/look" ]; then
             [ -f "$f_theme" ]  || printf 'default\n' > "$f_theme"
             [ -f "$f_border" ] || printf '2\n'       > "$f_border"
+            [ -f "$f_smart" ]  || printf 'on\n'      > "$f_smart"
             [ -f "$f_gaps" ]   || printf '0\n'       > "$f_gaps"
             [ -f "$f_bar" ]    || printf 'edge\n'    > "$f_bar"
             generate
@@ -132,9 +136,9 @@ case ${1:-menu} in
         fi
         ;;
     menu)
-        choice=$(printf 'Theme: %s\nBorder: %s px\nGaps: %s px\nBar: %s\n' \
+        choice=$(printf 'Theme: %s\nBorder: %s px\nSmart borders: %s\nGaps: %s px\nBar: %s\n' \
             "$(get "$f_theme" default)" "$(get "$f_border" 2)" \
-            "$(get "$f_gaps" 0)" "$(get "$f_bar" edge)" |
+            "$(get "$f_smart" on)" "$(get "$f_gaps" 0)" "$(get "$f_bar" edge)" |
             fuzzel --dmenu -p 'Look: ')
         case $choice in
             Theme:*)
@@ -157,6 +161,16 @@ case ${1:-menu} in
                 # exec_always): рамка применяется мгновенно сама по себе,
                 # а look-файл нужен только будущим стартам sway.
                 swaymsg "default_border pixel $new; default_floating_border pixel $new"
+                ;;
+            Smart\ borders:*)
+                current=$(get "$f_smart" on)
+                [ "$current" = on ] && other=off || other=on
+                new=$(printf '* %s\n%s\n' "$current" "$other" | fuzzel --dmenu -p 'Smart borders: ')
+                new=${new#\* }
+                case $new in on | off) ;; *) exit 0 ;; esac
+                printf '%s\n' "$new" > "$f_smart"
+                generate
+                swaymsg "smart_borders $new"
                 ;;
             Gaps:*)
                 new=$(printf '0\n4\n8\n12\n' | fuzzel --dmenu -p 'Gaps px: ')

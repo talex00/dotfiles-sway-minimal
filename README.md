@@ -199,7 +199,8 @@ swaymsg -t get_outputs                  # имена выходов и теку�
 | --- | --- |
 | `Theme` | цветовую тему: `default`, `light-pastel`, `dracula`, `violet` |
 | `Border` | толщину рамки окон в px — пресеты или произвольное число |
-| `Gaps` | отступы между окнами в px |
+| `Smart borders` | `on` — прятать рамку у единственного окна (поведение по умолчанию) / `off` — рамки видны всегда |
+| `Gaps` | отступы между окнами в px (видны и у единственного окна) |
 | `Bar` | режим панели: `edge` (прижата к краю) / `floating` (отступы от краёв + ободок в цвет темы) |
 
 Всё применяется на лету и запоминается. Тема — это данные в git: папка
@@ -207,7 +208,7 @@ swaymsg -t get_outputs                  # имена выходов и теку�
 `waybar.css`, `fuzzel.ini`, `mako`, `foot.ini`, `swaylock`) и маркером семейства
 `family` (`light`/`dark` — от него зависят GTK и сигнал foot). Своя тема =
 скопировать папку и поменять цвета. Текущий выбор лежит в state-файлах рядом с
-конфигами (`~/.config/sway/{theme,border,gaps,bar-mode,look}`,
+конфигами (`~/.config/sway/{theme,border,smart-borders,gaps,bar-mode,look}`,
 `~/.config/waybar/{theme.css,state.json,state.css}` и т.д.) и в git не попадает —
 как `wallpaper`.
 
@@ -215,7 +216,7 @@ swaymsg -t get_outputs                  # имена выходов и теку�
 
 | Компонент | Механизм |
 | --- | --- |
-| sway | цвета — через `swaymsg reload`; рамка и gaps — точечными `swaymsg` (так мгновенно и без лишнего рестарта waybar) |
+| sway | цвета — через `swaymsg reload`; рамка, smart_borders и gaps — точечными `swaymsg` (так мгновенно и без лишнего рестарта waybar) |
 | waybar | цвета — `theme.css` (импорт из `style.css`), margins — `state.json` (include из `config.jsonc`), ободок — `state.css`; перечитывается по `SIGUSR2` |
 | mako | `makoctl reload` |
 | fuzzel, swaylock | ничего: конфиг читается при каждом запуске (swaylock — цвета флагами из `lock.sh`) |

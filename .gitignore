@@ -11,6 +11,7 @@ sway/.config/sway/workspaces
 # Внешний вид: выбор и сгенерированные state-файлы (scripts/look.sh)
 sway/.config/sway/theme
 sway/.config/sway/border
+sway/.config/sway/smart-borders
 sway/.config/sway/gaps
 sway/.config/sway/bar-mode
 sway/.config/sway/look
