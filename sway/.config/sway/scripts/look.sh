@@ -11,8 +11,10 @@
 #   mako   — makoctl reload
 #   foot   — SIGUSR1 (тёмная тема) / SIGUSR2 (светлая): переключает все окна
 #   fuzzel и swaylock — ничего: конфиг читается при каждом запуске
-#   GTK    — gsettings color-scheme (портал, libadwaita) + settings.ini
-#            (GTK3/4 на Wayland без xsettingsd читают только его)
+#   GTK    — gsettings color-scheme (портал, libadwaita, браузеры) +
+#            settings.ini для GTK3/4; тёмность — вариантом prefer-dark при
+#            обычной Adwaita: отдельной темы Adwaita-dark может не быть
+#            (она в gnome-themes-extra), и тогда GTK молча падает на светлую
 #   Qt     — ничего: системную тему на sway Qt не видит (QTBUG-141102);
 #            у Happ своя: Настройки → Тема
 #
@@ -82,19 +84,21 @@ generate() {
     cp "$themes/$theme/foot.ini"   "$HOME/.config/foot/theme.ini"
     cp "$themes/$theme/swaylock"   "$HOME/.config/swaylock/theme-colors"
 
-    # GTK: color-scheme читают libadwaita и xdg-портал (браузеры), а GTK3/4
-    # на Wayland без xsettingsd — только settings.ini. Пишем оба канала.
+    # GTK: color-scheme читают libadwaita и xdg-портал (браузеры), GTK3/4 —
+    # gtk-theme-name + prefer-dark (settings.ini и gsettings). Тёмность —
+    # вариантом встроенной Adwaita, как у самого GNOME: темы с именем
+    # Adwaita-dark может не быть (она в gnome-themes-extra).
     if [ "$(theme_family)" = dark ]; then
-        scheme=prefer-dark; gtk=Adwaita-dark; prefer=true
+        scheme=prefer-dark; prefer=true
     else
-        scheme=prefer-light; gtk=Adwaita; prefer=false
+        scheme=prefer-light; prefer=false
     fi
     if command -v gsettings >/dev/null 2>&1; then
         gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null
-        gsettings set org.gnome.desktop.interface gtk-theme "$gtk" 2>/dev/null
+        gsettings set org.gnome.desktop.interface gtk-theme Adwaita 2>/dev/null
     fi
-    gtk_theme_ini 3.0 "$gtk" "$prefer"
-    gtk_theme_ini 4.0 "$gtk" "$prefer"
+    gtk_theme_ini 3.0 Adwaita "$prefer"
+    gtk_theme_ini 4.0 Adwaita "$prefer"
 }
 
 reload() {
