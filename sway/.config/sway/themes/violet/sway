@@ -1,0 +1,5 @@
+# Тёмная с уклоном в фиолетовый.
+client.focused          #a78bfa #a78bfa #1b1726 #6fd3a7 #a78bfa
+client.focused_inactive #2a2438 #2a2438 #7d7390 #2a2438 #2a2438
+client.unfocused        #2a2438 #2a2438 #7d7390 #2a2438 #2a2438
+client.urgent           #ff6b81 #ff6b81 #1b1726 #ff6b81 #ff6b81
