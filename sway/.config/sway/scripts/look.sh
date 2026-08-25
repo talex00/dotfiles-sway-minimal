@@ -69,11 +69,12 @@ generate() {
 
     # waybar: цвета — theme.css (импорт из style.css), режим панели —
     # margins в state.json (include из config.jsonc) и ободок в state.css.
+    # floating: отступы = gaps, чтобы верх и низ панели были вровень с окнами.
     cp "$themes/$theme/waybar.css" "$HOME/.config/waybar/theme.css"
     if [ "$bar" = floating ]; then
         printf 'window#waybar {\n    border: 2px solid @accent;\n}\n' \
             > "$HOME/.config/waybar/state.css"
-        m=8
+        m=$gaps
     else
         : > "$HOME/.config/waybar/state.css"
         m=0
@@ -181,6 +182,8 @@ case ${1:-menu} in
                 # воркспейсы могут остаться со старыми отступами. Форма
                 # all set применяется ко всем воркспейсам и сразу.
                 swaymsg "gaps inner all set $new"
+                # margins floating-панели равны gaps — перечитать state.json
+                pkill -SIGUSR2 waybar
                 ;;
             Bar:*)
                 current=$(get "$f_bar" edge)
