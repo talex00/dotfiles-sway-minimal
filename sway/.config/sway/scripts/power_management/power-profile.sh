@@ -3,7 +3,8 @@
 # Без аргумента спрашивает профиль через fuzzel. Нужен sudo.
 set -eu
 
-profile=${1:-$(printf 'eco\nbalanced\nperformance\n' | fuzzel --dmenu -p 'Power: ')}
+profile=${1:-$(printf 'eco\nbalanced\nperformance\n' | fuzzel --dmenu -p 'Power: ' || true)}
+[ -n "$profile" ] || exit 0
 
 case "$profile" in
     eco)         watts=10 boost=0 epp=power ;;
