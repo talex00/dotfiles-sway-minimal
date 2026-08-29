@@ -7,6 +7,7 @@
 
 | Роль | Пакет |
 | --- | --- |
+| Дисплей-менеджер (вход) | greetd + tuigreet |
 | Оконный менеджер | sway + autotiling (спиральный split) |
 | Терминал | foot |
 | Панель | waybar (вертикальная, слева) |
@@ -30,12 +31,14 @@
 yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel mako \
     polkit-gnome thunar stow fish fastfetch grim slurp gammastep batsignal \
     wl-clipboard cliphist jq playerctl brightnessctl ddcutil network-manager-applet \
-    blueman nwg-displays inter-font adwaita-icon-theme
+    blueman nwg-displays inter-font adwaita-icon-theme greetd greetd-tuigreet
 
 cd ~/dotfiles-sway-minimal
 chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
 stow sway foot fuzzel mako fish xfce
+sudo stow -t / greetd                      # раскладывает /etc/greetd/config.toml
 ~/.config/sway/scripts/look.sh ensure   # state-файлы темы: один раз, дальше сами
+sudo systemctl enable greetd            # включение службы экрана входа
 ```
 
 `swaylock-effects` заменяет обычный `swaylock` — менеджер пакетов предложит замену,

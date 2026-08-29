@@ -1,0 +1,10 @@
+[terminal]
+# Виртуальный терминал для экрана входа
+vt = 1
+
+[default_session]
+# Запуск tuigreet: меню пользователей, время, автозапоминание и сессия Sway
+command = "tuigreet --time --user-menu --remember --remember-session --asterisks --sessions /usr/share/wayland-sessions --cmd sway"
+
+# Пользователь, от имени которого работает экран входа
+user = "greeter"
