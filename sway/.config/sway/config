@@ -147,6 +147,9 @@ bindsym $mod+Shift+Down  move down
 bindsym --whole-window $mod+button4 workspace prev
 bindsym --whole-window $mod+button5 workspace next
 
+bindsym $mod+Tab       workspace next_on_output
+bindsym $mod+Shift+Tab workspace prev_on_output
+
 bindgesture swipe:3:left  workspace next_on_output
 bindgesture swipe:3:right workspace prev_on_output
 
