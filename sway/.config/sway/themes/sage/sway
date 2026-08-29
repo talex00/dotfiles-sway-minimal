@@ -1,0 +1,6 @@
+# Тема sage — светлая шалфейная (мягкий молочно-зелёный фон, пастельный шалфейный акцент).
+# indicator = border: полоса направления сплита отключена.
+client.focused          #5b9a6f #5b9a6f #ffffff #5b9a6f #5b9a6f
+client.focused_inactive #8a9e8f #8a9e8f #ffffff #8a9e8f #8a9e8f
+client.unfocused        #8a9e8f #8a9e8f #ffffff #8a9e8f #8a9e8f
+client.urgent           #d9534f #d9534f #ffffff #d9534f #d9534f

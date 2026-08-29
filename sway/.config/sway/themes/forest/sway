@@ -1,0 +1,6 @@
+# Тема forest — светлая контрастная (белый фон, глубокий изумрудный акцент).
+# indicator = border: полоса направления сплита отключена.
+client.focused          #1f8a4c #1f8a4c #ffffff #1f8a4c #1f8a4c
+client.focused_inactive #595959 #595959 #ffffff #595959 #595959
+client.unfocused        #595959 #595959 #ffffff #595959 #595959
+client.urgent           #e53935 #e53935 #ffffff #e53935 #e53935

@@ -1,0 +1,14 @@
+# Цвета темы forest.
+ring-color=ffffff
+inside-color=00000066
+text-color=ffffff
+key-hl-color=1f8a4c
+bs-hl-color=e53935
+layout-bg-color=00000066
+layout-text-color=ffffff
+ring-clear-color=ffffff
+inside-clear-color=00000066
+ring-ver-color=1f8a4c
+inside-ver-color=00000066
+ring-wrong-color=e53935
+inside-wrong-color=00000066

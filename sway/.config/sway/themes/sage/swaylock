@@ -1,0 +1,14 @@
+# Цвета темы sage.
+ring-color=f7f9f7
+inside-color=1f292266
+text-color=ffffff
+key-hl-color=5b9a6f
+bs-hl-color=d9534f
+layout-bg-color=1f292266
+layout-text-color=ffffff
+ring-clear-color=f7f9f7
+inside-clear-color=1f292266
+ring-ver-color=5b9a6f
+inside-ver-color=1f292266
+ring-wrong-color=d9534f
+inside-wrong-color=1f292266

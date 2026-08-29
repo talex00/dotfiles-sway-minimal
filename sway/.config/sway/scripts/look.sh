@@ -91,13 +91,19 @@ generate() {
 
     # foot не перечитывает конфиг и держит ровно два слота ([colors-dark] и
     # [colors-light]); сигналы переключают только между палитрами, загруженными
-    # при старте. Поэтому theme.ini собираем из палитр ВСЕХ тем сразу, иначе
-    # живое переключение показывало бы встроенные дефолты. Стартовую палитру
-    # новых окон задаёт initial-color-theme текущей темы.
+    # при старте. В theme.ini включаем палитру текущей темы и палитру темы
+    # противоположного семейства (для корректного живого переключения).
     {
         printf 'initial-color-theme=%s\n\n' "$family"
+        [ -f "$themes/$theme/foot.ini" ] && cat "$themes/$theme/foot.ini" && printf '\n'
         for t in "$themes"/*; do
-            [ -f "$t/foot.ini" ] && cat "$t/foot.ini" && printf '\n'
+            if [ -d "$t" ] && [ "$t" != "$themes/$theme" ]; then
+                other_family=$(family_of "${t##*/}")
+                if [ "$other_family" != "$family" ] && [ -f "$t/foot.ini" ]; then
+                    cat "$t/foot.ini" && printf '\n'
+                    break
+                fi
+            fi
         done
     } > "$HOME/.config/foot/theme.ini"
 

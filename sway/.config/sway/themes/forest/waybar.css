@@ -1,0 +1,32 @@
+/* Тема forest — светлая контрастная. @accent использует state.css (ободок floating-панели). */
+@define-color accent #1f8a4c;
+
+window#waybar {
+    background: #ffffff;
+    color: #181a18;
+}
+
+#workspaces button {
+    color: #888888;
+}
+
+#workspaces button.focused {
+    color: #181a18;
+}
+
+#workspaces button.urgent {
+    color: #e53935;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #1f8a4c;
+}
+
+#battery.critical:not(.charging) {
+    color: #e53935;
+}
+
+@keyframes blink {
+    to { color: #181a18; }
+}
