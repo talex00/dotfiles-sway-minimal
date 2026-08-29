@@ -35,6 +35,7 @@ exec_always sh -c 'pkill -x waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1
 exec autotiling
 
 exec mako
+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec batsignal -b
 exec nm-applet --indicator
 exec blueman-applet

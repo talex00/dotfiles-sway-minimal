@@ -12,6 +12,7 @@
 | Панель | waybar (вертикальная, слева) |
 | Лаунчер и dmenu | fuzzel |
 | Уведомления | mako |
+| Аутентификация (polkit) | polkit-gnome |
 | Блокировка, обои, idle | swaylock-effects, swaybg, swayidle |
 | Файловый менеджер | Thunar |
 | Буфер обмена | wl-clipboard + cliphist |
@@ -27,9 +28,9 @@
 
 ```bash
 yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel mako \
-    thunar stow fish fastfetch grim slurp gammastep batsignal wl-clipboard \
-    cliphist jq playerctl brightnessctl ddcutil network-manager-applet blueman \
-    nwg-displays inter-font adwaita-icon-theme
+    polkit-gnome thunar stow fish fastfetch grim slurp gammastep batsignal \
+    wl-clipboard cliphist jq playerctl brightnessctl ddcutil network-manager-applet \
+    blueman nwg-displays inter-font adwaita-icon-theme
 
 cd ~/dotfiles-sway-minimal
 chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
