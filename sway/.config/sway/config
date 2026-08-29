@@ -71,8 +71,8 @@ mouse_warping none
 
 #                       border  background text    indicator child_border
 client.focused          #33ccff #33ccff    #ffffff #33ccff   #33ccff
-client.focused_inactive #595959 #595959    #ffffff #595959   #595959
-client.unfocused        #595959 #595959    #ffffff #595959   #595959
+client.focused_inactive #d0d0d0 #d0d0d0    #555555 #d0d0d0   #d0d0d0
+client.unfocused        #d0d0d0 #d0d0d0    #555555 #d0d0d0   #d0d0d0
 client.urgent           #ff0000 #ff0000    #ffffff #ff0000   #ff0000
 
 # indicator = border: полоса «куда откроется следующее окно» отключена —
