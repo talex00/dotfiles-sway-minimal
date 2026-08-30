@@ -85,6 +85,7 @@ client.urgent           #ff0000 #ff0000    #ffffff #ff0000   #ff0000
 include ~/.config/sway/look*
 
 for_window [app_id="thunar" floating=true] move position center
+for_window [app_id="floating_brightness"] floating enable, resize set 480 260, move position center
 
 
 # --- Input ---
@@ -200,5 +201,5 @@ bindsym --locked XF86AudioPlay        exec playerctl play-pause
 bindsym --locked XF86AudioPause       exec playerctl play-pause
 bindsym --locked XF86AudioNext        exec playerctl next
 
-bindsym XF86MonBrightnessUp   exec $scripts/brightness.sh up
-bindsym XF86MonBrightnessDown exec $scripts/brightness.sh down
+bindsym --locked XF86MonBrightnessUp   exec $scripts/brightness.sh up
+bindsym --locked XF86MonBrightnessDown exec $scripts/brightness.sh down
