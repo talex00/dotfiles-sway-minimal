@@ -23,13 +23,24 @@
     font-weight: bold;
 }
 
+#custom-arch {
+    font-size: 13px;
+    padding: 2px 0;
+    color: #1793d1;
+}
+
 #window,
 #language,
+#keyboard-state,
 #tray,
 #pulseaudio,
 #clock,
 #battery {
     padding: 2px 0;
+}
+
+#keyboard-state label.locked {
+    font-weight: bold;
 }
 
 #battery.critical:not(.charging) {

@@ -66,9 +66,9 @@ default_border pixel 2
 default_floating_border pixel 2
 smart_borders on
 
-# Фокус идёт за мышью, но курсор не прыгает при переключении клавишами.
+# Фокус идёт за мышью, при смене фокуса клавишами курсор перемещается в центр активного окна.
 focus_follows_mouse always
-mouse_warping none
+mouse_warping container
 
 #                       border  background text    indicator child_border
 client.focused          #33ccff #33ccff    #ffffff #33ccff   #33ccff

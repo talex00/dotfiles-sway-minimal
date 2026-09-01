@@ -9,9 +9,23 @@
     // определение, а это оно.
     "include": "~/.config/waybar/state.json",
 
-    "modules-left": ["sway/workspaces"],
+    "modules-left": ["custom/arch", "sway/workspaces"],
     "modules-center": ["sway/window"],
-    "modules-right": ["sway/language", "tray", "pulseaudio", "clock", "battery"],
+    "modules-right": ["keyboard-state", "sway/language", "tray", "pulseaudio", "clock", "battery"],
+
+    "custom/arch": {
+        "format": "",
+        "tooltip": false
+    },
+
+    "keyboard-state": {
+        "capslock": true,
+        "format": "{icon}",
+        "format-icons": {
+            "locked": "CAPS",
+            "unlocked": ""
+        }
+    },
 
     "sway/workspaces": {
         "all-outputs": true,
