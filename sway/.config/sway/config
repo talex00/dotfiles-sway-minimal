@@ -126,6 +126,8 @@ bindsym --to-code $mod+W exec $scripts/wallpaper.sh
 bindsym --to-code $mod+bracketright exec $scripts/script_selector.sh
 bindsym --to-code $mod+Shift+S exec grim -g "$(slurp)" - | wl-copy
 bindsym --to-code $mod+Ctrl+S exec $scripts/screenshot.sh
+bindsym --to-code $mod+Shift+T exec $scripts/translate.sh
+bindsym --to-code $mod+Ctrl+Shift+T exec $scripts/ocr.sh
 bindsym --to-code Ctrl+space exec $handy
 bindsym --to-code Ctrl+$mod+Mod1+R reload
 bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
