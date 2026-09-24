@@ -1,12 +1,12 @@
 #!/bin/sh
-# Меню внешнего вида: тема, толщина рамки, smart_borders, gaps, режим панели.
+# Меню внешнего вида: тема, толщина рамки, smart_borders, gaps, режим панели, курсор.
 #
 # Темы — данные, а не правки конфигов: палитры лежат в git (themes/<имя>/),
 # текущий выбор — в state-файлах рядом с конфигами (в git не попадают, как
 # wallpaper). Применение = пересобрать state-файлы из темы и разослать
 # сигналы перезагрузки:
-#   sway   — swaymsg reload для цветов темы; рамка, smart_borders и gaps —
-#            точечными swaymsg (gaps через reload подхватываются не всегда)
+#   sway   — swaymsg reload для цветов темы; рамка, smart_borders, gaps и
+#            курсор — точечными swaymsg (gaps через reload подхватываются не всегда)
 #   waybar — SIGUSR2: перечитывает и config (margins из state.json), и css
 #   mako   — makoctl reload
 #   foot   — SIGUSR1 (тёмная) / SIGUSR2 (светлая): theme.ini собирается из
@@ -29,12 +29,43 @@ f_border="$HOME/.config/sway/border"
 f_smart="$HOME/.config/sway/smart-borders"
 f_gaps="$HOME/.config/sway/gaps"
 f_bar="$HOME/.config/sway/bar-mode"
+f_cursor="$HOME/.config/sway/cursor"
 
 # state-файл или дефолт (ice), если его ещё нет
 get() { cat "$1" 2>/dev/null || printf '%s\n' "$2"; }
 
 family_of() { cat "$themes/$1/family" 2>/dev/null || printf 'light\n'; }
 theme_family() { family_of "$(get "$f_theme" ice)"; }
+
+cursor_label() {
+    cur=$(get "$f_cursor" oreo_spark_lite_cursors)
+    case $cur in
+        Adwaita|default) printf 'default\n' ;;
+        oreo_*)
+            c=${cur#oreo_}
+            c=${c%_cursors}
+            printf 'oreo (%s)\n' "$(printf '%s\n' "$c" | tr '_' ' ')"
+            ;;
+        *) printf '%s\n' "$cur" ;;
+    esac
+}
+
+# GTK3/4 settings.ini для курсора
+gtk_cursor_ini() { # $1 = версия (3.0/4.0), $2 = тема, $3 = размер
+    ini="$HOME/.config/gtk-$1/settings.ini"
+    mkdir -p "${ini%/*}"
+    [ -f "$ini" ] || printf '[Settings]\n' > "$ini"
+    awk -v cur="$2" -v sz="${3:-24}" '
+        /^\[Settings\]/ { in_s=1; print; next }
+        /^\[/ { if (in_s && !done) { print "gtk-cursor-theme-name=" cur; print "gtk-cursor-theme-size=" sz; done=1; in_s=0 } print; next }
+        in_s && /^(gtk-cursor-theme-name|gtk-cursor-theme-size)=/ { next }
+        { print }
+        END {
+            if (in_s && !done) { print "gtk-cursor-theme-name=" cur; print "gtk-cursor-theme-size=" sz; done=1 }
+            if (!done) { print ""; print "[Settings]"; print "gtk-cursor-theme-name=" cur; print "gtk-cursor-theme-size=" sz }
+        }
+    ' "$ini" > "$ini.tmp" && mv "$ini.tmp" "$ini"
+}
 
 # GTK3/4 на Wayland без xsettingsd читают не gsettings, а settings.ini.
 # Правим ровно два ключа в группе [Settings], остальное в файле сохраняем.
@@ -63,12 +94,13 @@ generate() {
     smart=$(get "$f_smart" on)
     gaps=$(get "$f_gaps" 0)
     bar=$(get "$f_bar" edge)
+    cursor=$(get "$f_cursor" oreo_spark_lite_cursors)
 
     # sway: один генерируемый файл; include'ится после базовых значений
     # и поэтому переопределяет их.
     cat "$themes/$theme/sway" > "$HOME/.config/sway/look"
-    printf 'default_border pixel %s\ndefault_floating_border pixel %s\nsmart_borders %s\ngaps inner %s\n' \
-        "$border" "$border" "$smart" "$gaps" >> "$HOME/.config/sway/look"
+    printf 'default_border pixel %s\ndefault_floating_border pixel %s\nsmart_borders %s\ngaps inner %s\nseat * xcursor_theme %s 24\n' \
+        "$border" "$border" "$smart" "$gaps" "$cursor" >> "$HOME/.config/sway/look"
 
     # waybar: цвета — theme.css (импорт из style.css), режим панели —
     # margins в state.json (include из config.jsonc) и ободок в state.css.
@@ -121,9 +153,21 @@ generate() {
     if command -v gsettings >/dev/null 2>&1; then
         gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null
         gsettings set org.gnome.desktop.interface gtk-theme Adwaita 2>/dev/null
+        gsettings set org.gnome.desktop.interface cursor-theme "$cursor" 2>/dev/null
+        gsettings set org.gnome.desktop.interface cursor-size 24 2>/dev/null
     fi
     gtk_theme_ini 3.0 Adwaita "$prefer"
     gtk_theme_ini 4.0 Adwaita "$prefer"
+    gtk_cursor_ini 3.0 "$cursor" 24
+    gtk_cursor_ini 4.0 "$cursor" 24
+
+    for d in "$HOME/.icons/default" "$HOME/.local/share/icons/default"; do
+        mkdir -p "$d"
+        printf '[Icon Theme]\nName=Default\nComment=Default Cursor Theme\nInherits=%s\n' "$cursor" > "$d/index.theme"
+    done
+
+    command -v dbus-update-activation-environment >/dev/null 2>&1 && \
+        dbus-update-activation-environment --systemd XCURSOR_THEME="$cursor" XCURSOR_SIZE=24 2>/dev/null
 }
 
 reload() {
@@ -143,22 +187,24 @@ case ${1:-menu} in
         # Без state-файлов include'ы fuzzel/foot/waybar ругались бы. Всё на
         # месте — выходим сразу: ensure есть в автозапуске каждой сессии.
         if [ ! -f "$f_theme" ] || [ ! -f "$f_border" ] || [ ! -f "$f_smart" ] ||
-           [ ! -f "$f_gaps" ] || [ ! -f "$f_bar" ] ||
+           [ ! -f "$f_gaps" ] || [ ! -f "$f_bar" ] || [ ! -f "$f_cursor" ] ||
            [ ! -f "$HOME/.config/sway/look" ]; then
             [ -f "$f_theme" ]  || printf 'ice\n' > "$f_theme"
             [ -f "$f_border" ] || printf '2\n'    > "$f_border"
             [ -f "$f_smart" ]  || printf 'on\n'   > "$f_smart"
             [ -f "$f_gaps" ]   || printf '0\n'    > "$f_gaps"
             [ -f "$f_bar" ]    || printf 'edge\n' > "$f_bar"
+            [ -f "$f_cursor" ] || printf 'oreo_spark_lite_cursors\n' > "$f_cursor"
             generate
             # конфиг sway уже прочитан к моменту exec — подхватить look
             pgrep -x sway >/dev/null && swaymsg reload
         fi
         ;;
     menu)
-        choice=$(printf 'Theme: %s\nBorder: %s px\nSmart borders: %s\nGaps: %s px\nBar: %s\n' \
+        choice=$(printf 'Theme: %s\nBorder: %s px\nSmart borders: %s\nGaps: %s px\nBar: %s\nCursor: %s\n' \
             "$(get "$f_theme" ice)" "$(get "$f_border" 2)" \
-            "$(get "$f_smart" on)" "$(get "$f_gaps" 0)" "$(get "$f_bar" edge)" |
+            "$(get "$f_smart" on)" "$(get "$f_gaps" 0)" "$(get "$f_bar" edge)" \
+            "$(cursor_label)" |
             fuzzel --dmenu -p 'Look: ')
         case $choice in
             Theme:*)
@@ -213,6 +259,57 @@ case ${1:-menu} in
                 printf '%s\n' "$new" > "$f_bar"
                 generate
                 reload
+                ;;
+            Cursor:*)
+                current=$(get "$f_cursor" oreo_spark_lite_cursors)
+                case $current in
+                    Adwaita|default) cur_type=default ;;
+                    *) cur_type=oreo ;;
+                esac
+
+                [ "$cur_type" = default ] && def_opt="* Default" || def_opt="Default"
+                [ "$cur_type" = oreo ]    && oreo_opt="* Oreo"   || oreo_opt="Oreo"
+
+                type_choice=$(printf '%s\n%s\n' "$def_opt" "$oreo_opt" | fuzzel --dmenu -p 'Cursor: ')
+                type_choice=${type_choice#\* }
+
+                case $type_choice in
+                    Default)
+                        printf 'Adwaita\n' > "$f_cursor"
+                        generate
+                        swaymsg "seat * xcursor_theme Adwaita 24"
+                        ;;
+                    Oreo)
+                        oreo_names=$(find "$HOME/.local/share/icons" /usr/share/icons -maxdepth 1 -type d -name "oreo_*_cursors" 2>/dev/null | sed 's|.*/||' | sort -u)
+                        [ -n "$oreo_names" ] || exit 0
+
+                        list=""
+                        for name in $oreo_names; do
+                            color=${name#oreo_}
+                            color=${color%_cursors}
+                            display_color=$(printf '%s\n' "$color" | tr '_' ' ')
+                            if [ "$name" = "$current" ]; then
+                                list="${list}* ${display_color}\n"
+                            else
+                                list="${list}${display_color}\n"
+                            fi
+                        done
+
+                        color_choice=$(printf '%b' "$list" | fuzzel --dmenu -p 'Oreo color: ')
+                        color_choice=${color_choice#\* }
+                        [ -n "$color_choice" ] || exit 0
+
+                        target="oreo_$(printf '%s\n' "$color_choice" | tr ' ' '_')_cursors"
+                        if [ -d "$HOME/.local/share/icons/$target" ] || [ -d "/usr/share/icons/$target" ]; then
+                            printf '%s\n' "$target" > "$f_cursor"
+                            generate
+                            swaymsg "seat * xcursor_theme $target 24"
+                        fi
+                        ;;
+                    *)
+                        exit 0
+                        ;;
+                esac
                 ;;
             *)
                 exit 0

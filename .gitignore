@@ -14,6 +14,7 @@ sway/.config/sway/border
 sway/.config/sway/smart-borders
 sway/.config/sway/gaps
 sway/.config/sway/bar-mode
+sway/.config/sway/cursor
 sway/.config/sway/look
 sway/.config/waybar/theme.css
 sway/.config/waybar/state.json

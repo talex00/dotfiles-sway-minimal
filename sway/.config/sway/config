@@ -14,9 +14,7 @@ set $menu    fuzzel
 set $scripts ~/.config/sway/scripts
 
 # Диктовка Handy: переключить запись у живого процесса, иначе поднять его.
-# Имя процесса ровно handy — AppImage форкает его из себя, а сам остаётся
-# Handy.AppImage и SIGUSR2 не обрабатывает, поэтому -x без -i — то что нужно.
-set $handy pkill -USR2 -x handy || Handy.AppImage
+set $handy pkill -USR2 -x handy || handy
 
 
 # --- Autostart ---
@@ -69,6 +67,7 @@ smart_borders on
 # Фокус идёт за мышью, при смене фокуса клавишами курсор перемещается в центр активного окна.
 focus_follows_mouse always
 mouse_warping container
+seat * xcursor_theme Adwaita 24
 
 #                       border  background text    indicator child_border
 client.focused          #33ccff #33ccff    #ffffff #33ccff   #33ccff

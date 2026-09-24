@@ -126,7 +126,7 @@ Wayland не даёт приложениям перехватывать глоб
 toggle, а не push-to-talk: сигнал переключает запись, а не держит её.
 
 ```
-set $handy pkill -USR2 -x handy || Handy.AppImage
+set $handy pkill -USR2 -x handy || handy
 bindsym --to-code Ctrl+space exec $handy
 ```
 
