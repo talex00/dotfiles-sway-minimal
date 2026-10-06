@@ -1,9 +1,16 @@
 /* Dracula. */
 @define-color accent #bd93f9;
+@define-color bg #282a36;
+@define-color fg #f8f8f2;
+@define-color muted #6272a4;
+@define-color card-bg #343746;
+@define-color card-border rgba(255, 255, 255, 0.08);
+@define-color shadow-dark rgba(0, 0, 0, 0.50);
+@define-color shadow-light rgba(255, 255, 255, 0.06);
 
 window#waybar {
-    background: #282a36;
-    color: #f8f8f2;
+    background: @bg;
+    color: @fg;
 }
 
 #workspaces button {

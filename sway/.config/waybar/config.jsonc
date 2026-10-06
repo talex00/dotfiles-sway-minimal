@@ -1,12 +1,9 @@
 {
     "layer": "top",
-    "position": "left",
-    "width": 25,
     "spacing": 4,
 
-    // Режим панели (edge/floating): margins живут в state.json, его пишет
-    // scripts/look.sh. Здесь их не задавать: при дубле побеждает первое
-    // определение, а это оно.
+    // Динамические параметры (позиция, размеры, margins, clock, sway/window)
+    // генерируются scripts/look.sh в state.json:
     "include": "~/.config/waybar/state.json",
 
     "modules-left": ["custom/arch", "sway/workspaces"],
@@ -32,13 +29,6 @@
         "disable-scroll": true
     },
 
-    // rotate заменяет прежний custom/window со скриптом и опросом раз в секунду.
-    "sway/window": {
-        "format": "{title}",
-        "max-length": 15,
-        "rotate": 90
-    },
-
     "sway/language": {
         "format-en": "US",
         "format-ru": "RU"
@@ -48,12 +38,6 @@
         "format": "{volume}%",
         "format-muted": "--",
         "on-click": "pavucontrol"
-    },
-
-    "clock": {
-        "format": "{:%H\n%M}",
-        "format-alt": "{:%d\n%m}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
 
     "battery": {

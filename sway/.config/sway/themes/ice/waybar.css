@@ -1,9 +1,16 @@
 /* Тема ice — светлая. @accent использует state.css (ободок floating-панели). */
 @define-color accent #33ccff;
+@define-color bg #ffffff;
+@define-color fg #000000;
+@define-color muted #888888;
+@define-color card-bg #f3f5f8;
+@define-color card-border rgba(0, 0, 0, 0.08);
+@define-color shadow-dark rgba(0, 0, 0, 0.12);
+@define-color shadow-light rgba(255, 255, 255, 0.95);
 
 window#waybar {
-    background: #ffffff;
-    color: #000000;
+    background: @bg;
+    color: @fg;
 }
 
 #workspaces button {

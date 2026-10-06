@@ -1,0 +1,102 @@
+/* Графический стиль Cards: модули в виде отдельных карточек с рамкой, скруглением и тенью */
+
+* {
+    font-size: 10px;
+}
+
+#custom-arch {
+    font-size: 18px;
+    padding: 2px 0;
+    margin: 2px 2px;
+    color: #1793d1;
+    background: @card-bg;
+    border: 1px solid @card-border;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px @shadow-dark;
+}
+
+#workspaces {
+    background: transparent;
+    padding: 0;
+    margin: 1px 0;
+}
+
+#workspaces button {
+    background: @card-bg;
+    color: @muted;
+    border: 1px solid @card-border;
+    border-radius: 5px;
+    margin: 2px 2px;
+    padding: 2px 0;
+    box-shadow: 0 1px 2px @shadow-dark;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.focused {
+    background: @accent;
+    color: @bg;
+    border-color: @accent;
+    font-weight: bold;
+    box-shadow: 0 2px 4px @shadow-dark;
+}
+
+#workspaces button.urgent {
+    background: #ff5555;
+    color: #ffffff;
+    border-color: #ff5555;
+}
+
+#window,
+#language,
+#keyboard-state,
+#tray,
+#pulseaudio,
+#clock,
+#battery {
+    background: @card-bg;
+    border: 1px solid @card-border;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px @shadow-dark;
+    margin: 2px 2px;
+    padding: 3px 0;
+}
+
+/* Специфика горизонтальной раскладки */
+window#waybar.horizontal #custom-arch,
+window#waybar.top #custom-arch,
+window#waybar.bottom #custom-arch {
+    padding: 0 8px;
+    margin: 3px 3px;
+}
+
+window#waybar.horizontal #workspaces button,
+window#waybar.top #workspaces button,
+window#waybar.bottom #workspaces button {
+    margin: 3px 2px;
+    padding: 0 7px;
+}
+
+window#waybar.horizontal #window,
+window#waybar.horizontal #language,
+window#waybar.horizontal #keyboard-state,
+window#waybar.horizontal #tray,
+window#waybar.horizontal #pulseaudio,
+window#waybar.horizontal #clock,
+window#waybar.horizontal #battery,
+window#waybar.top #window,
+window#waybar.top #language,
+window#waybar.top #keyboard-state,
+window#waybar.top #tray,
+window#waybar.top #pulseaudio,
+window#waybar.top #clock,
+window#waybar.top #battery,
+window#waybar.bottom #window,
+window#waybar.bottom #language,
+window#waybar.bottom #keyboard-state,
+window#waybar.bottom #tray,
+window#waybar.bottom #pulseaudio,
+window#waybar.bottom #clock,
+window#waybar.bottom #battery {
+    margin: 3px 2px;
+    padding: 0 7px;
+}

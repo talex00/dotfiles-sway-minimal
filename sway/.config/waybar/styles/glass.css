@@ -1,0 +1,105 @@
+/* Стиль Glassmorphism: полупрозрачная основа и матовые плашки модулей */
+
+* {
+    font-size: 10px;
+}
+
+window#waybar {
+    background: alpha(@bg, 0.75);
+}
+
+#custom-arch {
+    font-size: 18px;
+    padding: 2px 0;
+    margin: 2px 2px;
+    color: #1793d1;
+    background: alpha(@card-bg, 0.65);
+    border: 1px solid alpha(@fg, 0.15);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#workspaces {
+    background: transparent;
+    padding: 0;
+    margin: 1px 0;
+}
+
+#workspaces button {
+    background: alpha(@card-bg, 0.50);
+    color: @muted;
+    border: 1px solid alpha(@fg, 0.10);
+    border-radius: 5px;
+    margin: 2px 2px;
+    padding: 2px 0;
+    transition: all 0.2s ease;
+}
+
+#workspaces button.focused {
+    background: alpha(@accent, 0.40);
+    border-color: @accent;
+    color: @fg;
+    font-weight: bold;
+    box-shadow: 0 2px 5px alpha(@accent, 0.35);
+}
+
+#workspaces button.urgent {
+    background: alpha(#ff5555, 0.60);
+    color: #ffffff;
+    border-color: #ff5555;
+}
+
+#window,
+#language,
+#keyboard-state,
+#tray,
+#pulseaudio,
+#clock,
+#battery {
+    background: alpha(@card-bg, 0.60);
+    border: 1px solid alpha(@fg, 0.12);
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    margin: 2px 2px;
+    padding: 3px 0;
+}
+
+/* Специфика горизонтальной раскладки */
+window#waybar.horizontal #custom-arch,
+window#waybar.top #custom-arch,
+window#waybar.bottom #custom-arch {
+    padding: 0 8px;
+    margin: 3px 3px;
+}
+
+window#waybar.horizontal #workspaces button,
+window#waybar.top #workspaces button,
+window#waybar.bottom #workspaces button {
+    margin: 3px 2px;
+    padding: 0 7px;
+}
+
+window#waybar.horizontal #window,
+window#waybar.horizontal #language,
+window#waybar.horizontal #keyboard-state,
+window#waybar.horizontal #tray,
+window#waybar.horizontal #pulseaudio,
+window#waybar.horizontal #clock,
+window#waybar.horizontal #battery,
+window#waybar.top #window,
+window#waybar.top #language,
+window#waybar.top #keyboard-state,
+window#waybar.top #tray,
+window#waybar.top #pulseaudio,
+window#waybar.top #clock,
+window#waybar.top #battery,
+window#waybar.bottom #window,
+window#waybar.bottom #language,
+window#waybar.bottom #keyboard-state,
+window#waybar.bottom #tray,
+window#waybar.bottom #pulseaudio,
+window#waybar.bottom #clock,
+window#waybar.bottom #battery {
+    margin: 3px 2px;
+    padding: 0 7px;
+}
