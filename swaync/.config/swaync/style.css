@@ -5,6 +5,10 @@
     font-size: 11px;
 }
 
+:root {
+    --notification-shadow: none;
+}
+
 /* Fallback переменные для тем */
 @define-color text-color @fg;
 @define-color cc-bg @bg;
@@ -17,7 +21,7 @@
     color: @fg;
     border: 1px solid @accent;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: 12px;
 }
 
@@ -29,11 +33,38 @@
 .control-center .notification-row:focus,
 .control-center .notification-row:hover {
     opacity: 0.95;
+    background: transparent;
+}
+
+/* Очистка теней и подложек групп */
+.notification-row,
+.notification-row:focus,
+.notification-row:hover,
+.notification-group,
+.notification-group:focus,
+.notification-group.collapsed {
+    background: transparent;
+    outline: none;
+    box-shadow: none;
+}
+
+.notification-group.collapsed .notification-row .notification {
+    background-color: @card-bg;
+    box-shadow: none;
+    border: 1px solid @card-border;
+}
+
+.control-center .control-center-list .notification,
+.control-center .control-center-list {
+    box-shadow: none;
+    background: transparent;
 }
 
 /* Карточки в истории уведомлений */
 .notification-row .notification-background {
     padding: 4px 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .notification-row .notification-background .notification {
@@ -41,6 +72,7 @@
     color: @fg;
     border: 1px solid @card-border;
     border-radius: 6px;
+    box-shadow: none;
     padding: 0;
 }
 
@@ -112,6 +144,7 @@
     border-radius: 4px;
     padding: 4px 8px;
     margin: 4px;
+    box-shadow: none;
 }
 
 .notification-action:hover {
@@ -137,6 +170,7 @@
     border: 1px solid @card-border;
     border-radius: 5px;
     padding: 3px 8px;
+    box-shadow: none;
 }
 
 .widget-title > button:hover {
@@ -152,6 +186,7 @@
     border-radius: 6px;
     margin: 4px 0 8px 0;
     padding: 6px 10px;
+    box-shadow: none;
 }
 
 .widget-dnd > label {
@@ -160,6 +195,7 @@
 
 .widget-dnd > switch {
     border-radius: 10px;
+    box-shadow: none;
 }
 
 .widget-dnd > switch:checked {
@@ -177,7 +213,7 @@
     color: @fg;
     border: 1px solid @accent;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: 6px;
     margin: 6px;
 }
