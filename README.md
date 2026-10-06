@@ -12,7 +12,7 @@
 | Терминал | foot |
 | Панель | waybar (вертикальная, слева) |
 | Лаунчер и dmenu | fuzzel |
-| Уведомления | mako |
+| Уведомления | swaync (SwayNotificationCenter) |
 | Аутентификация (polkit) | polkit-gnome |
 | Блокировка, обои, idle | swaylock-effects, swaybg, swayidle |
 | Файловый менеджер | Thunar |
@@ -28,14 +28,19 @@
 ## Установка
 
 ```bash
-yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel mako \
+# Arch Linux:
+yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel swaync \
     polkit-gnome thunar stow fish fastfetch grim slurp gammastep batsignal \
     wl-clipboard cliphist jq playerctl brightnessctl ddcutil network-manager-applet \
     blueman nwg-displays inter-font adwaita-icon-theme greetd greetd-tuigreet
 
+# Ubuntu 24.04 LTS:
+# пакет swaync называется sway-notification-center:
+# sudo apt install sway-notification-center
+
 cd ~/dotfiles-sway-minimal
 chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
-stow sway foot fuzzel mako fish xfce
+stow sway foot fuzzel swaync fish xfce
 sudo stow -t / greetd                      # раскладывает /etc/greetd/config.toml
 ~/.config/sway/scripts/look.sh ensure   # state-файлы темы: один раз, дальше сами
 sudo systemctl enable greetd            # включение службы экрана входа
@@ -55,6 +60,7 @@ sudo systemctl enable greetd            # включение службы экр
 | `Super + V` | история буфера обмена |
 | `Super + W` | смена обоев |
 | `Super + N` | ночной режим (gammastep) |
+| `Super + Shift + N` | центр уведомлений (swaync) |
 | `Super + L` | блокировка экрана |
 | `Super + ]` | меню скриптов |
 | `Ctrl + Space` | диктовка: вкл/выкл запись в Handy |
@@ -211,11 +217,11 @@ swaymsg -t get_outputs                  # имена выходов и теку�
 
 Всё применяется на лету и запоминается. Тема — это данные в git: папка
 `sway/.config/sway/themes/<имя>/` с фрагментом на каждое приложение (`sway`,
-`waybar.css`, `fuzzel.ini`, `mako`, `foot.ini`, `swaylock`) и маркером семейства
+`waybar.css`, `fuzzel.ini`, `swaync.css`, `foot.ini`, `swaylock`) и маркером семейства
 `family` (`light`/`dark` — от него зависят GTK и сигнал foot). Своя тема =
 скопировать папку и поменять цвета. Текущий выбор лежит в state-файлах рядом с
 конфигами (`~/.config/sway/{theme,border,smart-borders,gaps,bar-mode,look}`,
-`~/.config/waybar/{theme.css,state.json,state.css}` и т.д.) и в git не попадает —
+`~/.config/waybar/{theme.css,state.json,state.css}`, `~/.config/swaync/theme.css` и т.д.) и в git не попадает —
 как `wallpaper`.
 
 Как применяется:
@@ -224,12 +230,12 @@ swaymsg -t get_outputs                  # имена выходов и теку�
 | --- | --- |
 | sway | цвета — через `swaymsg reload`; рамка, smart_borders и gaps — точечными `swaymsg` (так мгновенно и без лишнего рестарта waybar) |
 | waybar | цвета — `theme.css` (импорт из `style.css`), margins — `state.json` (include из `config.jsonc`), ободок — `state.css`; перечитывается по `SIGUSR2`, в т.ч. при смене gaps (отступы floating-панели сверху и снизу равны им) |
-| mako | `makoctl reload` |
+| swaync | `swaync-client -rs -R` (перечитывает конфиг и стили) |
 | fuzzel, swaylock | ничего: конфиг читается при каждом запуске (swaylock — цвета флагами из `lock.sh`) |
 | foot | SIGUSR1/2, мгновенно для всех окон: theme.ini собирается из палитр всех тем сразу, а стартовую задаёт `initial-color-theme` текущей |
 | GTK | тёмность — вариантом встроенной `Adwaita` через `gtk-application-prefer-dark-theme` + `color-scheme`: пишется и в `~/.config/gtk-3.0`/`gtk-4.0/settings.ini`, и в gsettings (портал, libadwaita, браузеры). Имени `Adwaita-dark` не используем: отдельной темы с таким именем может не быть (она в `gnome-themes-extra`), и тогда GTK молча откатывается на светлую |
 
-Цвета в базовых конфигах sway и mako оставлены нарочно: это фолбэк, совпадающий
+Цвета в базовых конфигах sway и swaync оставлены нарочно: это фолбэк, совпадающий
 с темой `ice`, — свежая система до первого `ensure` выглядит как раньше.
 Недостающие state-файлы `look.sh ensure` создаёт сам (он есть и в автозапуске
 sway, поэтому после первого входа в сессию всё уже на месте).

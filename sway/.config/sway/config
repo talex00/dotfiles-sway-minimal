@@ -32,7 +32,7 @@ exec_always sh -c 'pkill -x waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1
 # по соотношению сторон и даёт ту же спираль.
 exec autotiling
 
-exec mako
+exec swaync
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec batsignal -b
 exec nm-applet --indicator
@@ -120,6 +120,7 @@ bindsym --to-code $mod+B floating toggle
 bindsym --to-code $mod+P sticky toggle
 bindsym --to-code $mod+L exec $scripts/lock.sh
 bindsym --to-code $mod+N exec pkill gammastep || gammastep -O 4500
+bindsym --to-code $mod+Shift+N exec swaync-client -t -sw
 bindsym --to-code $mod+V exec cliphist list | $menu --dmenu | cliphist decode | wl-copy
 bindsym --to-code $mod+W exec $scripts/wallpaper.sh
 bindsym --to-code $mod+bracketright exec $scripts/script_selector.sh

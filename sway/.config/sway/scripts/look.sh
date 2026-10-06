@@ -8,7 +8,7 @@
 #   sway   — swaymsg reload для цветов темы; рамка, smart_borders, gaps и
 #            курсор — точечными swaymsg (gaps через reload подхватываются не всегда)
 #   waybar — SIGUSR2: перечитывает и config (margins из state.json), и css
-#   mako   — makoctl reload
+#   swaync — swaync-client -rs -R
 #   foot   — SIGUSR1 (тёмная) / SIGUSR2 (светлая): theme.ini собирается из
 #            палитр всех тем сразу, поэтому все окна переключаются мгновенно
 #   fuzzel и swaylock — ничего: конфиг читается при каждом запуске
@@ -202,7 +202,7 @@ generate() {
 EOF
 
     cp "$themes/$theme/fuzzel.ini" "$HOME/.config/fuzzel/theme.ini"
-    cp "$themes/$theme/mako"       "$HOME/.config/mako/theme"
+    [ -f "$themes/$theme/swaync.css" ] && cp "$themes/$theme/swaync.css" "$HOME/.config/swaync/theme.css"
 
     # foot не перечитывает конфиг и держит ровно два слота ([colors-dark] и
     # [colors-light]); сигналы переключают только между палитрами, загруженными
@@ -255,7 +255,7 @@ EOF
 
 reload() {
     swaymsg reload >/dev/null 2>&1
-    makoctl reload 2>/dev/null
+    swaync-client -rs -R >/dev/null 2>&1
     if [ "$(theme_family)" = dark ]; then
         pkill -USR1 -x foot
     else
@@ -272,7 +272,8 @@ case ${1:-menu} in
            [ ! -f "$f_gaps" ] || [ ! -f "$f_bar" ] || [ ! -f "$f_cursor" ] ||
            [ ! -f "$f_bar_style" ] || [ ! -f "$f_bar_pos" ] ||
            [ ! -f "$HOME/.config/sway/look" ] ||
-           [ ! -f "$HOME/.config/waybar/style-variant.css" ]; then
+           [ ! -f "$HOME/.config/waybar/style-variant.css" ] ||
+           [ ! -f "$HOME/.config/swaync/theme.css" ]; then
             [ -f "$f_theme" ]     || printf 'ice\n' > "$f_theme"
             [ -f "$f_border" ]    || printf '2\n'    > "$f_border"
             [ -f "$f_smart" ]     || printf 'on\n'   > "$f_smart"
@@ -340,7 +341,7 @@ case ${1:-menu} in
                 # all set применяется ко всем воркспейсам и сразу.
                 swaymsg "gaps inner all set $new"
                 # margins floating-панели зависят от gaps — перезапустить waybar
-                reload_waybar
+                reload
                 ;;
             Bar:*)
                 current=$(get "$f_bar" edge)

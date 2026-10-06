@@ -1,0 +1,118 @@
+@import url("theme.css");
+
+* {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+}
+
+/* Шторка центра уведомлений */
+.control-center {
+    background: @bg;
+    color: @fg;
+    border: 1px solid @accent;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    padding: 12px;
+}
+
+.control-center .notification-row {
+    outline: none;
+    margin: 4px 0;
+}
+
+.control-center .notification-row:focus,
+.control-center .notification-row:hover {
+    opacity: 0.95;
+}
+
+.notification-background {
+    background: @card-bg;
+    color: @fg;
+    border: 1px solid @card-border;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+.notification-default-action {
+    padding: 4px;
+    margin: 0;
+    box-shadow: none;
+    background: transparent;
+    border: none;
+    color: @fg;
+}
+
+.notification-action {
+    background: @card-bg;
+    color: @fg;
+    border: 1px solid @card-border;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 4px;
+}
+
+.notification-action:hover {
+    background: @accent;
+    color: @bg;
+}
+
+.notification-close-button {
+    background: transparent;
+    color: @fg;
+    border: none;
+    padding: 4px;
+}
+
+/* Заголовок с кнопкой очистки */
+.widget-title {
+    color: @fg;
+    margin: 4px 0 8px 0;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.widget-title > button {
+    background: @card-bg;
+    color: @fg;
+    border: 1px solid @card-border;
+    border-radius: 5px;
+    padding: 3px 8px;
+}
+
+.widget-title > button:hover {
+    background: @accent;
+    color: @bg;
+}
+
+/* Виджет Не беспокоить */
+.widget-dnd {
+    background: @card-bg;
+    color: @fg;
+    border: 1px solid @card-border;
+    border-radius: 6px;
+    margin: 4px 0 8px 0;
+    padding: 6px 10px;
+}
+
+.widget-dnd > switch {
+    border-radius: 10px;
+}
+
+.widget-dnd > switch:checked {
+    background: @accent;
+}
+
+/* Всплывающие уведомления (popups) */
+.floating-notifications {
+    background: transparent;
+}
+
+.floating-notifications .notification {
+    background: @bg;
+    color: @fg;
+    border: 1px solid @accent;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    margin: 6px;
+}
