@@ -32,7 +32,9 @@ exec_always sh -c 'pkill -x waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1
 # по соотношению сторон и даёт ту же спираль.
 exec autotiling
 
-exec swaync
+# swaync стартует через systemd-юнит (WantedBy=graphical-session.target):
+# переживает падение. Дублировать через exec нельзя — будет гонка
+# за org.freedesktop.Notifications с другим демоном уведомлений.
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec batsignal -b
 exec nm-applet --indicator
