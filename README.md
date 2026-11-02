@@ -32,7 +32,8 @@
 yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel swaync \
     polkit-gnome thunar stow fish fastfetch grim slurp gammastep batsignal \
     wl-clipboard cliphist jq playerctl brightnessctl ddcutil network-manager-applet \
-    blueman nwg-displays inter-font adwaita-icon-theme xwayland-satellite greetd greetd-tuigreet
+    blueman nwg-displays inter-font adwaita-icon-theme oreo-cursors-bin \
+    xwayland-satellite greetd greetd-tuigreet
 
 # Ubuntu 24.04 LTS:
 # пакет swaync называется sway-notification-center:
@@ -221,6 +222,7 @@ swaymsg -t get_outputs                  # имена выходов и теку�
 | `Bar` | режим панели: `edge` (прижата к краю) / `floating` (ободок в цвет темы) |
 | `Bar style` | стиль панели: `pragmatic` (компактный) / `neumorphism` (светотеневой объем) / `cards` (карточки с рамкой и тенью) / `glass` (стекло) |
 | `Bar position` | расположение панели: `left`, `right`, `top`, `bottom` |
+| `Cursor` | курсор: `Default` (Adwaita) / `Oreo` — цвет из установленных тем `oreo_*_cursors` (пакет `oreo-cursors-bin`) |
 
 Всё применяется на лету и запоминается. Тема — это данные в git: папка
 `sway/.config/sway/themes/<имя>/` с фрагментом на каждое приложение (`sway`,
