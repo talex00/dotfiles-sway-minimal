@@ -13,6 +13,15 @@ set $files   thunar
 set $menu    fuzzel
 set $scripts ~/.config/sway/scripts
 
+# Режим X11 выбирается сессией в tuigreet: скрипты session-mode-*.sh (дотфайлы
+# greetd) пишут/стирают фрагмент ниже. Satellite-сессия переопределяет $menu/
+# $term/$files префиксом env DISPLAY=:0 (позже set перекрывает прежнее
+# значение — все биндинги ниже уже запускают X11-детей с DISPLAY),
+# выключает встроенный Xwayland и запускает xwayland-satellite :0. Классическая
+# сессия файл стирает: встроенный Xwayland включен по умолчанию и DISPLAY
+# задаёт сам sway. Глоб: файла нет → обычные значения (sway не ругается).
+include ~/.config/sway/session-mode*
+
 # Диктовка Handy: переключить запись у живого процесса, иначе поднять его.
 set $handy pkill -USR2 -x handy || handy
 

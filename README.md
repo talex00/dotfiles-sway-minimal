@@ -32,7 +32,7 @@
 yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel swaync \
     polkit-gnome thunar stow fish fastfetch grim slurp gammastep batsignal \
     wl-clipboard cliphist jq playerctl brightnessctl ddcutil network-manager-applet \
-    blueman nwg-displays inter-font adwaita-icon-theme greetd greetd-tuigreet
+    blueman nwg-displays inter-font adwaita-icon-theme xwayland-satellite greetd greetd-tuigreet
 
 # Ubuntu 24.04 LTS:
 # пакет swaync называется sway-notification-center:
@@ -42,6 +42,13 @@ cd ~/dotfiles-sway-minimal
 chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
 stow sway foot fuzzel swaync fish xfce
 sudo stow -t / greetd                      # раскладывает /etc/greetd/config.toml
+# Сессии Sway / Sway (satellite) для tuigreet: копии, а не stow-симлинки —
+# greeter не может читать /home/alex (700) сквозь симлинки в дотфайлы.
+sudo mkdir -p /usr/local/share/wayland-sessions
+sudo install -m 644 greetd/usr/local/share/wayland-sessions/*.desktop \
+    /usr/local/share/wayland-sessions/
+sudo install -m 755 greetd/usr/local/share/wayland-sessions/*.sh \
+    /usr/local/share/wayland-sessions/
 ~/.config/sway/scripts/look.sh ensure   # state-файлы темы: один раз, дальше сами
 sudo systemctl enable greetd            # включение службы экрана входа
 ```

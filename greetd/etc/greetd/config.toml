@@ -4,7 +4,15 @@ vt = 1
 
 [default_session]
 # Запуск tuigreet: меню пользователей, время, автозапоминание и сессия Sway
-command = "tuigreet --time --user-menu --remember --remember-session --asterisks --sessions /usr/share/wayland-sessions --cmd sway"
+# tuigreet: F3 — меню сессий. Сессии лежат только в /usr/local/share/wayland-
+# sessions (флаг --sessions заменяет дефолтную разводку по XDG_DATA_DIRS, так
+# что пакетный sway.desktop в меню не дублируется). Оба Exec'а — скрипты из
+# дотфайлов (скопированные sudo-ом, greeter не читает /home/alex): satellite-
+# скрипт генерирует include-фрагмент конфига sway, classic-скрипт его стирает.
+# --cmd = classic как дефолт (и страховка на случай стёртого кэша remember).
+# ВАЖНО: сессии не должны получать DISPLAY/WAYLAND_DISPLAY до старта sway —
+# wlroots свернётся в nested-бэкенд вместо DRM и сессия мгновенно умрёт.
+command = "tuigreet --time --user-menu --remember --remember-session --asterisks --sessions /usr/local/share/wayland-sessions --cmd /usr/local/share/wayland-sessions/sway-classic.sh"
 
 # Пользователь, от имени которого работает экран входа
 user = "greeter"

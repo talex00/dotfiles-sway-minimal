@@ -1,5 +1,8 @@
 # runtime state, не коммитим
 sway/.config/sway/wallpaper
+# Режим X11-сессии (classic/satellite): при входе генерирует скрипт сессии,
+# классическая сессия файл стирает. См. include session-mode* в config sway.
+sway/.config/sway/session-mode*
 fish/.config/fish/fish_variables
 fish/.config/fish/fish_history
 

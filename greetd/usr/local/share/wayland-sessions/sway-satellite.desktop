@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Sway (satellite)
+Comment=Sway с xwayland-satellite: rootless X11 без «мыла» на HiDPI
+Exec=/usr/local/share/wayland-sessions/sway-satellite.sh
+Type=Application
+DesktopNames=sway
+Keywords=tiling;wm;wayland
