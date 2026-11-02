@@ -1,0 +1,39 @@
+/* Black — строгий монохром. */
+@define-color accent #ffffff;
+@define-color bg #000000;
+@define-color fg #ffffff;
+@define-color muted #888888;
+@define-color card-bg #111111;
+@define-color card-border rgba(255, 255, 255, 0.14);
+@define-color shadow-dark rgba(0, 0, 0, 0.80);
+@define-color shadow-light rgba(255, 255, 255, 0.08);
+
+window#waybar {
+    background: @bg;
+    color: @fg;
+}
+
+#workspaces button {
+    color: #888888;
+}
+
+#workspaces button.focused {
+    color: #ffffff;
+}
+
+#workspaces button.urgent {
+    color: #ffffff;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #ffffff;
+}
+
+#battery.critical:not(.charging) {
+    color: #ffffff;
+}
+
+@keyframes blink {
+    to { color: #ffffff; }
+}

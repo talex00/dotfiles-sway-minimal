@@ -1,0 +1,6 @@
+# Тема black — строгий монохром: чисто чёрный фон, белый акцент.
+# indicator = border: полоса направления сплита отключена.
+client.focused          #ffffff #ffffff #000000 #ffffff #ffffff
+client.focused_inactive #333333 #000000 #888888 #333333 #333333
+client.unfocused        #333333 #000000 #888888 #333333 #333333
+client.urgent           #ffffff #ffffff #000000 #ffffff #ffffff

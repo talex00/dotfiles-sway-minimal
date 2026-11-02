@@ -1,0 +1,5 @@
+@define-color bg #000000;
+@define-color fg #ffffff;
+@define-color accent #ffffff;
+@define-color card-bg #111111;
+@define-color card-border rgba(255, 255, 255, 0.14);

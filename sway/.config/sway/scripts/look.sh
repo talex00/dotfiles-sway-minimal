@@ -95,6 +95,23 @@ gtk_theme_ini() { # $1 = версия (3.0/4.0), $2 = тема, $3 = prefer-dark
     ' "$ini" > "$ini.tmp" && mv "$ini.tmp" "$ini"
 }
 
+# GTK3/4 icon-theme в settings.ini (Thunar и файловые диалоги).
+gtk_icon_ini() { # $1 = версия (3.0/4.0), $2 = иконки
+    ini="$HOME/.config/gtk-$1/settings.ini"
+    mkdir -p "${ini%/*}"
+    [ -f "$ini" ] || printf '[Settings]\n' > "$ini"
+    awk -v icon="$2" '
+        /^\[Settings\]/ { in_s=1; print; next }
+        /^\[/ { if (in_s && !done) { print "gtk-icon-theme-name=" icon; done=1; in_s=0 } print; next }
+        in_s && /^gtk-icon-theme-name=/ { next }
+        { print }
+        END {
+            if (in_s && !done) { print "gtk-icon-theme-name=" icon; done=1 }
+            if (!done) { print ""; print "[Settings]"; print "gtk-icon-theme-name=" icon }
+        }
+    ' "$ini" > "$ini.tmp" && mv "$ini.tmp" "$ini"
+}
+
 # Собирает все state-файлы из текущего выбора. Сам ничего не перезагружает.
 generate() {
     theme=$(get "$f_theme" ice)
@@ -241,6 +258,25 @@ EOF
     fi
     gtk_theme_ini 3.0 Adwaita "$prefer"
     gtk_theme_ini 4.0 Adwaita "$prefer"
+    # Иконки: берём из themes/<имя>/icon-theme, иначе Adwaita.
+    # fuzzel это не касается: у него свой icon-theme в fuzzel.ini.
+    if [ -f "$themes/$theme/icon-theme" ]; then
+        icon=$(cat "$themes/$theme/icon-theme")
+    else
+        icon=Adwaita
+    fi
+    if command -v gsettings >/dev/null 2>&1; then
+        gsettings set org.gnome.desktop.interface icon-theme "$icon" 2>/dev/null
+    fi
+    gtk_icon_ini 3.0 "$icon"
+    gtk_icon_ini 4.0 "$icon"
+    # Чисто чёрный Thunar: gtk.css кладём только если он есть в теме (black),
+    # иначе удаляем, чтобы ice/forest/dracula оставались на чистом Adwaita.
+    if [ -f "$themes/$theme/gtk3.css" ]; then
+        cp "$themes/$theme/gtk3.css" "$HOME/.config/gtk-3.0/gtk.css"
+    else
+        rm -f "$HOME/.config/gtk-3.0/gtk.css"
+    fi
     gtk_cursor_ini 3.0 "$cursor" 24
     gtk_cursor_ini 4.0 "$cursor" 24
 
