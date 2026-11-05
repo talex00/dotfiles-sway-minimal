@@ -60,19 +60,19 @@ cursor_label() {
     esac
 }
 
-# GTK3/4 settings.ini для курсора
-gtk_cursor_ini() { # $1 = версия (3.0/4.0), $2 = тема, $3 = размер
+# GTK3/4 settings.ini: только имя курсора, размер не задаём.
+gtk_cursor_ini() { # $1 = версия (3.0/4.0), $2 = тема
     ini="$HOME/.config/gtk-$1/settings.ini"
     mkdir -p "${ini%/*}"
     [ -f "$ini" ] || printf '[Settings]\n' > "$ini"
-    awk -v cur="$2" -v sz="${3:-24}" '
+    awk -v cur="$2" '
         /^\[Settings\]/ { in_s=1; print; next }
-        /^\[/ { if (in_s && !done) { print "gtk-cursor-theme-name=" cur; print "gtk-cursor-theme-size=" sz; done=1; in_s=0 } print; next }
+        /^\[/ { if (in_s && !done) { print "gtk-cursor-theme-name=" cur; done=1; in_s=0 } print; next }
         in_s && /^(gtk-cursor-theme-name|gtk-cursor-theme-size)=/ { next }
         { print }
         END {
-            if (in_s && !done) { print "gtk-cursor-theme-name=" cur; print "gtk-cursor-theme-size=" sz; done=1 }
-            if (!done) { print ""; print "[Settings]"; print "gtk-cursor-theme-name=" cur; print "gtk-cursor-theme-size=" sz }
+            if (in_s && !done) { print "gtk-cursor-theme-name=" cur; done=1 }
+            if (!done) { print ""; print "[Settings]"; print "gtk-cursor-theme-name=" cur }
         }
     ' "$ini" > "$ini.tmp" && mv "$ini.tmp" "$ini"
 }
@@ -135,7 +135,7 @@ generate() {
     # sway: один генерируемый файл; include'ится после базовых значений
     # и поэтому переопределяет их.
     cat "$themes/$theme/sway" > "$HOME/.config/sway/look"
-    printf 'default_border pixel %s\ndefault_floating_border pixel %s\nsmart_borders %s\ngaps inner %s\nseat * xcursor_theme %s 24\n' \
+    printf 'default_border pixel %s\ndefault_floating_border pixel %s\nsmart_borders %s\ngaps inner %s\nseat * xcursor_theme %s\n' \
         "$border" "$border" "$smart" "$gaps" "$cursor" >> "$HOME/.config/sway/look"
 
     # waybar: цвета — theme.css, стиль — style-variant.css, floating-ободок — state.css,
@@ -254,7 +254,6 @@ EOF
         gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null
         gsettings set org.gnome.desktop.interface gtk-theme Adwaita 2>/dev/null
         gsettings set org.gnome.desktop.interface cursor-theme "$cursor" 2>/dev/null
-        gsettings set org.gnome.desktop.interface cursor-size 24 2>/dev/null
     fi
     gtk_theme_ini 3.0 Adwaita "$prefer"
     gtk_theme_ini 4.0 Adwaita "$prefer"
@@ -277,8 +276,8 @@ EOF
     else
         rm -f "$HOME/.config/gtk-3.0/gtk.css"
     fi
-    gtk_cursor_ini 3.0 "$cursor" 24
-    gtk_cursor_ini 4.0 "$cursor" 24
+    gtk_cursor_ini 3.0 "$cursor"
+    gtk_cursor_ini 4.0 "$cursor"
 
     for d in "$HOME/.icons/default" "$HOME/.local/share/icons/default"; do
         mkdir -p "$d"
@@ -286,7 +285,7 @@ EOF
     done
 
     command -v dbus-update-activation-environment >/dev/null 2>&1 && \
-        dbus-update-activation-environment --systemd XCURSOR_THEME="$cursor" XCURSOR_SIZE=24 2>/dev/null
+        dbus-update-activation-environment --systemd XCURSOR_THEME="$cursor" 2>/dev/null
 }
 
 reload() {
@@ -442,7 +441,7 @@ case ${1:-menu} in
                     Default)
                         printf 'Adwaita\n' > "$f_cursor"
                         generate
-                        swaymsg "seat * xcursor_theme Adwaita 24"
+                        swaymsg "seat * xcursor_theme Adwaita"
                         ;;
                     Oreo)
                         oreo_names=$(find "$HOME/.local/share/icons" /usr/share/icons -maxdepth 1 -type d -name "oreo_*_cursors" 2>/dev/null | sed 's|.*/||' | sort -u)
@@ -468,7 +467,7 @@ case ${1:-menu} in
                         if [ -d "$HOME/.local/share/icons/$target" ] || [ -d "/usr/share/icons/$target" ]; then
                             printf '%s\n' "$target" > "$f_cursor"
                             generate
-                            swaymsg "seat * xcursor_theme $target 24"
+                            swaymsg "seat * xcursor_theme $target"
                         fi
                         ;;
                     *)

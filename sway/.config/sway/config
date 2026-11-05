@@ -74,10 +74,14 @@ default_border pixel 2
 default_floating_border pixel 2
 smart_borders on
 
-# Фокус идёт за мышью, при смене фокуса клавишами курсор перемещается в центр активного окна.
-focus_follows_mouse always
+# Фокус идёт за мышью, но не перебивает выбор клавиатурой: always повторно
+# фокусировал бы окно под курсором даже после смены фокуса клавишами, и
+# floating-окно под курсором отбирало бы фокус при первом движении мыши.
+# При смене фокуса клавишами курсор переносится в центр нового окна,
+# если он ещё не внутри него (mouse_warping container).
+focus_follows_mouse yes
 mouse_warping container
-seat * xcursor_theme Adwaita 24
+seat * xcursor_theme Adwaita
 
 #                       border  background text    indicator child_border
 client.focused          #33ccff #33ccff    #ffffff #33ccff   #33ccff
@@ -142,8 +146,11 @@ bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
 
 floating_modifier $mod normal
 
-bindsym Mod1+Tab       focus right
-bindsym Mod1+Shift+Tab focus left
+# Alt+Tab — цикл по видимым окнам активного воркспейса (включая floating),
+# Shift+Alt+Tab — назад. Нативный focus next/prev в бинарном autotiling-дереве
+# не давал различия вперёд/назад: оба вели к соседнему листу.
+bindsym Mod1+Tab       exec $scripts/window_cycle.sh next
+bindsym Mod1+Shift+Tab exec $scripts/window_cycle.sh prev
 
 bindsym $mod+Left  focus left
 bindsym $mod+Right focus right
