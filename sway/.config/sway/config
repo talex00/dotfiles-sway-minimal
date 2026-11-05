@@ -31,6 +31,9 @@ exec xwayland-satellite :0
 # старта waybar и первого запуска fuzzel/foot — их include'ы ждут эти файлы.
 exec $scripts/look.sh ensure
 
+# Thunar: закладки в сайдбаре и настройки автомонтирования съёмных дисков.
+exec $scripts/thunar.sh ensure
+
 # pkill и запуск обязательно в одном sh -c: два отдельных exec_always sway
 # стартует параллельно, и pkill убивает только что поднятый waybar.
 # Редирект в лог тоже обязателен — иначе waybar падает по SIGPIPE.

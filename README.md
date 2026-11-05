@@ -16,7 +16,7 @@
 | Уведомления | swaync (SwayNotificationCenter) |
 | Аутентификация (polkit) | polkit-gnome |
 | Блокировка, обои, idle | swaylock-effects, swaybg, swayidle |
-| Файловый менеджер | Thunar |
+| Файловый менеджер | Thunar + gvfs |
 | Буфер обмена | wl-clipboard + cliphist |
 | Скриншоты | grim + slurp |
 | Цветовая температура | gammastep |
@@ -31,10 +31,11 @@
 ```bash
 # Arch Linux:
 yay -S sway swaylock-effects swayidle swaybg autotiling waybar foot fuzzel swaync \
-    polkit-gnome thunar stow fish fastfetch grim slurp gammastep batsignal \
-    wl-clipboard cliphist jq playerctl brightnessctl ddcutil network-manager-applet \
-    blueman nwg-displays inter-font adwaita-icon-theme oreo-cursors-bin \
-    xwayland-satellite greetd greetd-tuigreet
+    polkit-gnome thunar gvfs thunar-volman tumbler ffmpegthumbnailer \
+    poppler-glib thunar-archive-plugin xarchiver zip unzip stow fish fastfetch \
+    grim slurp gammastep batsignal wl-clipboard cliphist jq playerctl brightnessctl \
+    ddcutil network-manager-applet blueman nwg-displays inter-font adwaita-icon-theme \
+    oreo-cursors-bin xwayland-satellite greetd greetd-tuigreet
 
 # Ubuntu 24.04 LTS:
 # пакет swaync называется sway-notification-center:
@@ -73,6 +74,33 @@ Xwayland самого sway выключен (`xwayland disable`), чтобы д�
 вложенный X11-бэкенд вместо DRM, и сессия не стартует на железе. Отдельной
 classic-сессии и выбора режима на экране входа нет: `xwayland-satellite` — единственный
 X-сервер.
+
+## Thunar
+
+`gvfs` (тянет `udisks2`) даёт в сайдбаре раздел **Devices**, монтирование,
+отмонтирование и безопасное извлечение, а также **Trash**. Отдельный демон для
+этого не нужен: `gvfs` и `udisks2` работают через D-Bus, `polkit-gnome` уже в
+автозапуске.
+
+`thunar-volman` умеет автомонтировать hot-plug диски. `scripts/thunar.sh` при
+входе включает автомонтирование, но выключает авто-открытие, автозапуск и
+autoopen. Если нужно автомонтирование при закрытом Thunar, добавьте в автозапуск
+`exec thunar --daemon`; по умолчанию его нет. GUI `thunar-volman-settings`
+показывает текущие значения, но при следующем входе `thunar.sh` вернёт значения
+из репозитория.
+
+`tumbler` + `ffmpegthumbnailer` (+ `poppler-glib`) дают превью видео и PDF,
+`thunar-archive-plugin` + `xarchiver` — пункты «Extract Here» и «Create
+Archive» в контекстном меню. Для zip-архивов стоят `zip`/`unzip`; для 7z
+добавьте `7zip`.
+
+Закладки на существующие каталоги (сейчас Downloads, Documents, Pictures;
+Desktop — если это каталог) `thunar.sh` создаёт только если файла
+`~/.config/gtk-3.0/bookmarks` ещё нет. Кастомные действия лежат в
+`xfce/.config/Thunar/uca.xml`. Файл `thunar.xml` — runtime-состояние (размер
+окна, колонки, сортировка), в git не хранится. Бэкенды для телефона, камеры и
+NAS (`gvfs-mtp`, `gvfs-gphoto2`, `gvfs-afc`, `gvfs-smb`) не ставятся по
+умолчанию — добавляйте по потребности.
 
 ## Горячие клавиши
 
@@ -282,6 +310,7 @@ sway, поэтому после первого входа в сессию всё
 | --- | --- |
 | `lock.sh` | блокировка теми же обоями, что на рабочем столе |
 | `look.sh` | меню внешнего вида: тема, рамки, gaps, режим панели |
+| `thunar.sh` | закладки и настройки Thunar: автомонтирование съёмных дисков |
 | `wallpaper.sh` | выбор и применение обоев |
 | `screenshot.sh` | скриншот области в файл и буфер |
 | `powermenu.sh` | logout / suspend / reboot / shutdown |

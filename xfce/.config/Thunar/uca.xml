@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here</name>
+	<submenu></submenu>
+	<unique-id>1792734763413838-1</unique-id>
+	<command>sh -c 'd=${2:-$HOME}; [ -n "$1" ] &amp;&amp; [ -d "$1" ] &amp;&amp; d=$1; exec foot -D "$d"' _ %f %d</command>
+	<description>Открыть foot в выбранном каталоге или рядом с файлом</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+<action>
+	<icon>edit-copy</icon>
+	<name>Copy Path</name>
+	<submenu></submenu>
+	<unique-id>1792734763413838-2</unique-id>
+	<command>sh -c '[ "$#" -gt 0 ] || exit 0; printf "%s\n" "$@" | wl-copy' _ %F</command>
+	<description>Скопировать путь выделенных файлов в буфер обмена</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+</actions>

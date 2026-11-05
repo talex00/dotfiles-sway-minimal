@@ -3,6 +3,11 @@ sway/.config/sway/wallpaper
 fish/.config/fish/fish_variables
 fish/.config/fish/fish_history
 
+# Thunar перезаписывает это сам: размер окна, колонки, сортировка.
+xfce/.config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
+# thunar-volman пишет сюда те же настройки, которые задаёт scripts/thunar.sh.
+xfce/.config/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml
+
 # Машинно-специфичное: выходы и привязка воркспейсов у каждой системы свои.
 # Именно эти два файла по умолчанию пишет nwg-displays.
 sway/.config/sway/outputs
