@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Sway
-Comment=Sway со встроенным Xwayland (классический режим)
-Exec=/usr/local/share/wayland-sessions/sway-classic.sh
+Comment=Sway; X11 через xwayland-satellite
+Exec=/usr/local/share/wayland-sessions/sway.sh
 Type=Application
 DesktopNames=sway
 Keywords=tiling;wm;wayland

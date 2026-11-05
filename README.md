@@ -9,6 +9,7 @@
 | --- | --- |
 | Дисплей-менеджер (вход) | greetd + tuigreet |
 | Оконный менеджер | sway + autotiling (спиральный split) |
+| X11 | xwayland-satellite (встроенный Xwayland sway выключен) |
 | Терминал | foot |
 | Панель | waybar (вертикальная, слева) |
 | Лаунчер и dmenu | fuzzel |
@@ -43,12 +44,12 @@ cd ~/dotfiles-sway-minimal
 chmod +x sway/.config/sway/scripts/*.sh sway/.config/sway/scripts/*/*.sh
 stow sway foot fuzzel swaync fish xfce
 sudo stow -t / greetd                      # раскладывает /etc/greetd/config.toml
-# Сессии Sway / Sway (satellite) для tuigreet: копии, а не stow-симлинки —
-# greeter не может читать /home/alex (700) сквозь симлинки в дотфайлы.
+# Сессия Sway для tuigreet: копия, а не stow-симлинк — greeter не может
+# читать /home/alex (700) сквозь симлинки в дотфайлы.
 sudo mkdir -p /usr/local/share/wayland-sessions
-sudo install -m 644 greetd/usr/local/share/wayland-sessions/*.desktop \
+sudo install -m 644 greetd/usr/local/share/wayland-sessions/sway.desktop \
     /usr/local/share/wayland-sessions/
-sudo install -m 755 greetd/usr/local/share/wayland-sessions/*.sh \
+sudo install -m 755 greetd/usr/local/share/wayland-sessions/sway.sh \
     /usr/local/share/wayland-sessions/
 ~/.config/sway/scripts/look.sh ensure   # state-файлы темы: один раз, дальше сами
 sudo systemctl enable greetd            # включение службы экрана входа
@@ -57,6 +58,21 @@ sudo systemctl enable greetd            # включение службы экр
 `swaylock-effects` заменяет обычный `swaylock` — менеджер пакетов предложит замену,
 это ожидаемо. Пакет `sway` раскладывает сразу `~/.config/sway`, `~/.config/waybar`
 и `~/.config/swaylock`.
+
+## X11
+
+X11-приложения работают только через `xwayland-satellite` на `:0`. Встроенный
+Xwayland самого sway выключен (`xwayland disable`), чтобы два сервера не делили
+дисплей. Пакет `xorg-xwayland` при этом обязателен — это бинарь Xwayland, который
+запускает satellite (приходит зависимостью `xwayland-satellite`).
+
+`DISPLAY=:0` задаётся один раз в `sway.sh` и наследуется всей сессией, а
+`dbus-update-activation-environment` прокидывает его в systemd/dbus. В конфигах
+приложений никаких `DISPLAY` нет. Рядом в `sway.sh` стоит
+`WLR_BACKENDS=libinput,drm`: без него при наличии `DISPLAY` wlroots выбирает
+вложенный X11-бэкенд вместо DRM, и сессия не стартует на железе. Отдельной
+classic-сессии и выбора режима на экране входа нет: `xwayland-satellite` — единственный
+X-сервер.
 
 ## Горячие клавиши
 

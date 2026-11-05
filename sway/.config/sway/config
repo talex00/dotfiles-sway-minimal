@@ -13,20 +13,19 @@ set $files   thunar
 set $menu    fuzzel
 set $scripts ~/.config/sway/scripts
 
-# Режим X11 выбирается сессией в tuigreet: скрипты session-mode-*.sh (дотфайлы
-# greetd) пишут/стирают фрагмент ниже. Satellite-сессия переопределяет $menu/
-# $term/$files префиксом env DISPLAY=:0 (позже set перекрывает прежнее
-# значение — все биндинги ниже уже запускают X11-детей с DISPLAY),
-# выключает встроенный Xwayland и запускает xwayland-satellite :0. Классическая
-# сессия файл стирает: встроенный Xwayland включен по умолчанию и DISPLAY
-# задаёт сам sway. Глоб: файла нет → обычные значения (sway не ругается).
-include ~/.config/sway/session-mode*
+# X11 — только xwayland-satellite на :0 (rootless, без «мыла» на HiDPI).
+# Встроенный Xwayland sway выключен, чтобы два сервера не делили :0; пакет
+# xorg-xwayland при этом нужен — это бинарь, который запускает satellite.
+xwayland disable
 
 # Диктовка Handy: переключить запись у живого процесса, иначе поднять его.
 set $handy pkill -USR2 -x handy || handy
 
 
 # --- Autostart ---
+
+# Первым: остальным X11-приложениям нужен готовый сокет :0.
+exec xwayland-satellite :0
 
 # State-файлы внешнего вида (тема, рамки, gaps): создать недостающие до
 # старта waybar и первого запуска fuzzel/foot — их include'ы ждут эти файлы.
@@ -52,7 +51,7 @@ exec $handy
 exec wl-paste --type text  --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 exec swaybg -m fill -i "$(cat $HOME/.config/sway/wallpaper 2>/dev/null || echo $HOME/Pictures/Wallpapers/frieren_meme.webp)"
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP=sway
 
 # Гасит eDP-1, если подключён внешний DP-1. Обязательно после
 # dbus-update-activation-environment, иначе swaymsg не найдёт сокет.
