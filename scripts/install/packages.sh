@@ -131,7 +131,8 @@ is_pkg_installed() {
 install_packages() {
     pkg_mgr="$1"
     shift
-    packages="$*"
+    # Trim whitespace
+    packages=$(printf '%s' "$*" | tr '\n' ' ' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     [ -n "$packages" ] || return 0
 
     msg_info "Installing packages: $packages"

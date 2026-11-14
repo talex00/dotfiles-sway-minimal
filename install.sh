@@ -157,6 +157,7 @@ packages_to_install="$missing_core"
 if [ "$INSTALL_OPTIONAL" -eq 1 ]; then
     packages_to_install="$packages_to_install $missing_optional"
 fi
+packages_to_install=$(printf '%s' "$packages_to_install" | tr '\n' ' ' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
 if [ -n "$packages_to_install" ]; then
     install_packages "$PKG_MANAGER" "$packages_to_install"
