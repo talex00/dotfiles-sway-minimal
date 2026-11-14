@@ -113,6 +113,30 @@ sh ~/.config/sway/scripts/look.sh menu      # интерактивное Fuzzel-
 
 ## Установка
 
+### ⚡ Быстрая установка одной командой (One-Line Remote Install)
+
+После установки чистой ОС (Ubuntu, Debian, Fedora, Arch) достаточно выполнить одну команду в терминале:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/talex00/dotfiles-sway-minimal/main/install.sh)"
+```
+*или через `wget`:*
+```bash
+bash -c "$(wget -qO- https://raw.githubusercontent.com/talex00/dotfiles-sway-minimal/main/install.sh)"
+```
+
+Скрипт полностью автономен:
+1. Проверяет наличие `git` и при необходимости автоматически устанавливает его.
+2. Клонирует репозиторий в `~/.dotfiles-sway-minimal`.
+3. Определяет дистрибутив и устанавливает полный стек пакетов (Sway, Waybar, Foot, gtklock, Thunar, шрифты и др.).
+4. Развёртывает конфигурации через GNU Stow (с защитой от схлопывания директорий `--no-folding` и авто-бэкапом конфликтующих файлов).
+5. Назначает Thunar файловым менеджером по умолчанию для всей системы и приложений (включая D-Bus сервис `FileManager1` и браузеры).
+6. Настраивает шрифты JetBrains Mono для Foot и Waybar, инициализирует Theme Engine 2.0.
+
+После завершения просто завершите сеанс и выберите сессию **Sway** на экране входа.
+
+---
+
 ### Универсальный установщик (Universal Installer)
 
 Проект оснащён модульным установщиком без внешних зависимостей (чистый POSIX/Bash), который поддерживает несколько дистрибутивов Linux:
@@ -240,7 +264,7 @@ stow -R sway foot fuzzel swaync fish thunar xfce xsettingsd
 ~/.config/sway/scripts/look.sh ensure   # state-файлы темы: один раз, дальше сами
 ```
 
-Пакет `sway` раскладывает `~/.config/sway`, `~/.config/waybar` и `~/.config/swaylock`.
+Пакет `sway` раскладывает `~/.config/sway`, `~/.config/waybar`, `~/.config/gtklock` и `~/.config/swaylock`.
 `thunar` и `xfce` — ПКМ → «Open Terminal Here» в foot.
 
 ## Горячие клавиши
