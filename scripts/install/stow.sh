@@ -65,6 +65,9 @@ deploy_stow() {
             (cd "$repo_dir" && stow --no-folding -t "$target_home" "$pkg")
         fi
     done
+    # Ensure all scripts have executable bits
+    [ -d "$target_home/.config/sway/scripts" ] && chmod +x "$target_home/.config/sway/scripts"/*.sh 2>/dev/null || true
+    [ -d "$target_home/.config/sway/scripts/helpers" ] && chmod +x "$target_home/.config/sway/scripts/helpers"/*.sh 2>/dev/null || true
     msg_ok "Dotfiles deployed successfully."
 }
 
@@ -85,9 +88,10 @@ bootstrap_theme_engine() {
     target_home="$1"
     look_script="$target_home/.config/sway/scripts/look.sh"
 
-    if [ -f "$look_script" ] && [ -x "$look_script" ]; then
+    if [ -f "$look_script" ]; then
         msg_info "Initializing Theme Engine 2.0 (ensure baseline configuration)..."
-        SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh "$look_script" ensure >/dev/null 2>&1 || true
+        chmod +x "$look_script" 2>/dev/null || true
+        SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh "$look_script" ensure || true
         msg_ok "Theme Engine initialized."
     fi
 }
