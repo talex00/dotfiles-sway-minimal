@@ -70,7 +70,7 @@ fail() { echo "FAIL: $*" >&2; exit 1; }
 pass() { echo "PASS: $*"; }
 
 # Setup initial valid desktop environment
-mkdir -p "$cfg/sway" "$cfg/waybar" "$cfg/foot" "$cfg/fuzzel" "$cfg/swaync" "$cfg/swaylock" \
+mkdir -p "$cfg/sway" "$cfg/waybar" "$cfg/foot" "$cfg/fuzzel" "$cfg/swaync" "$cfg/swaylock" "$cfg/gtklock" \
          "$cfg/gtk-3.0" "$cfg/gtk-4.0" "$cfg/sway/themes" "$cfg/waybar/styles"
 ln -s "$root/sway/.config/sway/scripts" "$cfg/sway/scripts"
 cp "$root/sway/.config/sway/config" "$cfg/sway/config"

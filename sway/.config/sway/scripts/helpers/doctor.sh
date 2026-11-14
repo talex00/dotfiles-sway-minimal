@@ -12,12 +12,12 @@ info() { printf 'INFO: %s\n' "$*"; }
 for cmd in sway swaymsg waybar foot fuzzel swaync swayidle swaybg jq stow; do
     if command -v "$cmd" >/dev/null 2>&1; then ok "$cmd available"; else err "$cmd missing"; fi
 done
-for cmd in swaylock grim slurp cliphist wl-paste wl-copy brightnessctl ddcutil wdisplays fish shellcheck shfmt; do
+for cmd in gtklock swaylock grim slurp cliphist wl-paste wl-copy brightnessctl ddcutil wdisplays fish shellcheck shfmt; do
     if command -v "$cmd" >/dev/null 2>&1; then ok "$cmd available"; else warn "$cmd missing (feature or development tool unavailable)"; fi
 done
 if [ -x "$HOME/.local/bin/autotiling" ]; then ok 'autotiling available'; else warn 'autotiling missing'; fi
 
-for dir in sway waybar swaylock fuzzel foot swaync; do
+for dir in sway waybar gtklock swaylock fuzzel foot swaync; do
     if [ -L "$config/$dir" ]; then
         if [ -e "$config/$dir" ]; then
             warn "$config/$dir is a directory symlink: generated files may modify source files"
@@ -31,7 +31,7 @@ for f in "$sway/config" "$sway/scripts/look.sh" "$config/waybar/config.jsonc" "$
 done
 theme=$(cat "$sway/theme" 2>/dev/null || printf ice)
 case "$theme" in ''|*[!a-zA-Z0-9_-]*) err 'invalid theme name'; theme=ice ;; esac
-for name in family sway swaylock waybar.css swaync.css fuzzel.ini foot.ini; do
+for name in family sway swaylock gtklock.css waybar.css swaync.css fuzzel.ini foot.ini; do
     if [ -r "$sway/themes/$theme/$name" ]; then ok "theme $theme/$name"; else err "missing theme $theme/$name"; fi
 done
 style=$(cat "$sway/bar-style" 2>/dev/null || printf pragmatic)

@@ -45,7 +45,7 @@ state="$XDG_STATE_HOME/sway-minimal-v2"
 
 # A realistic legacy HOME: folded scripts symlink, ordinary mutable files,
 # legacy preference files and separate Sway/GTK cursor sizes.
-mkdir -p "$cfg/sway" "$cfg/waybar" "$cfg/foot" "$cfg/fuzzel" "$cfg/swaync" "$cfg/swaylock" \
+mkdir -p "$cfg/sway" "$cfg/waybar" "$cfg/foot" "$cfg/fuzzel" "$cfg/swaync" "$cfg/swaylock" "$cfg/gtklock" \
          "$cfg/gtk-3.0" "$cfg/gtk-4.0" "$cfg/sway/themes" "$cfg/waybar/styles"
 ln -s "$root/sway/.config/sway/scripts" "$cfg/sway/scripts"
 cp "$root/sway/.config/sway/config" "$cfg/sway/config"
@@ -89,7 +89,7 @@ grep -Fq '"FontAwesome"' "$cfg/waybar/style.css" || fail 'Waybar icon font fallb
 grep -Fq '"JetBrains Mono"' "$cfg/waybar/style.css" || fail 'Waybar UI font missing'
 grep -Fq 'font-size: 13px' "$cfg/waybar/style.css" || fail 'Waybar base font size is too small'
 ! grep -Fq '' "$cfg/waybar/config.jsonc" || fail 'unsupported Nerd Font glyph remains in Waybar config'
-[[ -f $cfg/foot/theme.ini && -f $cfg/fuzzel/fuzzel.ini && -f $cfg/swaync/theme.css ]] || fail 'stable component files missing'
+[[ -f $cfg/foot/theme.ini && -f $cfg/fuzzel/fuzzel.ini && -f $cfg/swaync/theme.css && -f $cfg/gtklock/theme.css ]] || fail 'stable component files missing'
 echo 'PASS: production ensure bootstraps from legacy preferences and stable files'
 
 first=$(readlink "$state/current")

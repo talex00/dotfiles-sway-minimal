@@ -1,0 +1,8 @@
+@define-color window-bg #282a36;
+@define-color text-color #f8f8f2;
+@define-color subtext-color #6272a4;
+@define-color input-bg rgba(40, 42, 54, 0.88);
+@define-color border-color rgba(189, 147, 249, 0.35);
+@define-color accent-color #bd93f9;
+@define-color button-bg rgba(68, 71, 90, 0.88);
+@define-color button-hover-bg rgba(98, 114, 164, 0.95);

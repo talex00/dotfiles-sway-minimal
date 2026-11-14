@@ -59,7 +59,7 @@ exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DE
 # экран гаснет через 5 мин. Sway сам locker не поднимает — зовём lock.sh напрямую.
 # Кавычки вокруг "*" обязательны: swayidle выполняет команды через sh -c.
 exec swayidle -w \
-    timeout 300 'pgrep -x swaylock && swaymsg output "*" dpms off' resume 'swaymsg output "*" dpms on' \
+    timeout 300 '(pgrep -x gtklock || pgrep -x swaylock) && swaymsg output "*" dpms off' resume 'swaymsg output "*" dpms on' \
     timeout 600 '$scripts/lock.sh -f' \
     timeout 630 'swaymsg output "*" dpms off'                      resume 'swaymsg output "*" dpms on' \
     before-sleep '$scripts/lock.sh -f'

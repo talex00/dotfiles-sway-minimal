@@ -1,16 +1,49 @@
 #!/bin/sh
-# Блокировка теми же обоями, что на рабочем столе. В ~/.config/swaylock/config
-# путь не прописать: там нет ни подстановки команд, ни раскрытия ~.
-# Аргументы пробрасываем: swayidle зовёт с -f.
-# Цвета темы подмешиваем флагами из theme-colors (пишет scripts/look.sh):
-# формат строки конфига key=value совпадает с форматом флага --key=value,
-# а флаги командной строки важнее значений из конфига.
+# Sway Minimal — Экран блокировки (gtklock с fallback на swaylock).
+# Предотвращаем запуск дублирующих процессов блокировки:
+if pgrep -x gtklock >/dev/null 2>&1 || pgrep -x swaylock >/dev/null 2>&1; then
+    exit 0
+fi
 
 wallpaper=$(cat "$HOME/.config/sway/wallpaper" 2>/dev/null)
 if [ ! -f "$wallpaper" ] || [ ! -r "$wallpaper" ]; then
     wallpaper=$(find "$HOME/Pictures/Wallpapers" -maxdepth 1 -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | sort | head -n1)
 fi
 
+# Выбор блокировщика: предпочтение gtklock, fallback на swaylock
+locker="${SWAY_MINIMAL_LOCKER:-}"
+if [ -z "$locker" ]; then
+    if command -v gtklock >/dev/null 2>&1; then
+        locker="gtklock"
+    elif command -v swaylock >/dev/null 2>&1; then
+        locker="swaylock"
+    fi
+fi
+
+if [ "$locker" = "gtklock" ]; then
+    daemon=0
+    for arg in "$@"; do
+        case "$arg" in
+            -f|-d|--daemonize) daemon=1 ;;
+        esac
+    done
+    set --
+    [ "$daemon" -eq 1 ] && set -- "$@" -d
+
+    style="$HOME/.config/gtklock/style.css"
+    if [ -f "$style" ] && [ -r "$style" ]; then
+        set -- "$@" -s "$style"
+    fi
+
+    if [ -n "$wallpaper" ] && [ -f "$wallpaper" ] && [ -r "$wallpaper" ]; then
+        set -- "$@" -b "$wallpaper"
+    fi
+
+    set -- "$@" -t "%H:%M"
+    exec gtklock "$@"
+fi
+
+# --- Fallback: swaylock ---
 if [ -n "$wallpaper" ] && [ -f "$wallpaper" ] && [ -r "$wallpaper" ]; then
     set -- -i "$wallpaper" "$@"
 fi

@@ -24,6 +24,7 @@ sway/.config/waybar/theme.css
 sway/.config/waybar/style-variant.css
 sway/.config/waybar/state.css
 sway/.config/swaylock/theme-colors
+sway/.config/gtklock/theme.css
 foot/.config/foot/theme.ini
 swaync/.config/swaync/theme.css
 

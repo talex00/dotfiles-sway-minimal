@@ -320,6 +320,10 @@ EOF
     cp "$themes/$theme/foot.ini" "$HOME/.config/foot/theme.ini"
 
     cp "$themes/$theme/swaylock" "$HOME/.config/swaylock/theme-colors"
+    if [ -f "$themes/$theme/gtklock.css" ]; then
+        mkdir -p "$HOME/.config/gtklock"
+        cp "$themes/$theme/gtklock.css" "$HOME/.config/gtklock/theme.css"
+    fi
 
     # GTK: color-scheme читают libadwaita и xdg-портал (браузеры), GTK3/4 —
     # gtk-theme-name + prefer-dark (settings.ini и gsettings). Тёмность —

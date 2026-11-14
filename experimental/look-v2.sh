@@ -73,7 +73,7 @@ validate() {
 }
 validate_theme() {
     local theme=$1 f
-    for f in family sway swaylock waybar.css swaync.css fuzzel.ini foot.ini; do
+    for f in family sway swaylock gtklock.css waybar.css swaync.css fuzzel.ini foot.ini; do
         [[ -f $themes/$theme/$f && -r $themes/$theme/$f ]] || die "missing palette $theme/$f"
     done
     grep -Eq '^(light|dark)$' "$themes/$theme/family" || die 'invalid theme family'
@@ -371,7 +371,7 @@ build() (
     tmp=$(mktemp -d "$gens/gen.XXXXXXXX")
     # Only remove a fresh temporary generation, never an existing user directory.
     trap 'if [[ -n ${tmp:-} && -d $tmp ]]; then chmod -R u+w -- "$tmp"; rm -rf -- "$tmp"; fi' EXIT
-    mkdir -p "$tmp/preferences" "$tmp/imported" "$tmp/render-home/.config/"{sway,waybar,foot,fuzzel,swaync,swaylock,gtk-3.0,gtk-4.0} "$tmp/bin"
+    mkdir -p "$tmp/preferences" "$tmp/imported" "$tmp/render-home/.config/"{sway,waybar,foot,fuzzel,swaync,swaylock,gtklock,gtk-3.0,gtk-4.0} "$tmp/bin"
     [[ -z $import_dir ]] || import_hash=$(legacy_snapshot "$import_dir")
     if [[ -n $import_dir ]]; then
         [[ -f $import_dir/look && -r $import_dir/look ]] || die 'legacy look file missing'
@@ -430,7 +430,7 @@ build() (
     HOME="$h" XDG_CONFIG_HOME="$h/.config" XDG_STATE_HOME="$tmp/isolated-state" \
       XDG_RUNTIME_DIR="$tmp" DBUS_SESSION_BUS_ADDRESS=disabled: SWAY_MINIMAL_RENDER_ONLY=1 \
       sh -e "$legacy" generate >/dev/null || die 'renderer failed'
-    for key in "$h/.config/sway/look" "$h/.config/waybar/config.jsonc" "$h/.config/waybar/theme.css" "$h/.config/waybar/style-variant.css" "$h/.config/fuzzel/fuzzel.ini" "$h/.config/foot/theme.ini" "$h/.config/swaync/theme.css" "$h/.config/swaylock/theme-colors"; do
+    for key in "$h/.config/sway/look" "$h/.config/waybar/config.jsonc" "$h/.config/waybar/theme.css" "$h/.config/waybar/style-variant.css" "$h/.config/fuzzel/fuzzel.ini" "$h/.config/foot/theme.ini" "$h/.config/swaync/theme.css" "$h/.config/swaylock/theme-colors" "$h/.config/gtklock/theme.css"; do
         [[ -f $key && -r $key ]] || die "renderer did not produce $key"
     done
     command -v sway >/dev/null 2>&1 || die 'sway is required to validate generated configuration'
@@ -493,6 +493,7 @@ render-home/.config/foot/theme.ini|foot/theme.ini
 render-home/.config/fuzzel/fuzzel.ini|fuzzel/fuzzel.ini
 render-home/.config/swaync/theme.css|swaync/theme.css
 render-home/.config/swaylock/theme-colors|swaylock/theme-colors
+render-home/.config/gtklock/theme.css|gtklock/theme.css
 EOF
 }
 install_one() {
