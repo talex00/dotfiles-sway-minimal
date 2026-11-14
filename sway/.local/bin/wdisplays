@@ -1,0 +1,12 @@
+#!/bin/sh
+# Sway Minimal — wdisplays wrapper
+# In virtual machines (VMware/VirtualBox with virtual DRM drivers like vmwgfx),
+# hardware-accelerated DMA-BUF screencopy causes wlroots buffer errors and Broken pipe.
+# Fall back to software rasterization when running in a virtual machine or if requested.
+if [ -z "${LIBGL_ALWAYS_SOFTWARE:-}" ]; then
+    if systemd-detect-virt -q 2>/dev/null || [ -e /sys/module/vmwgfx ]; then
+        export LIBGL_ALWAYS_SOFTWARE=1
+    fi
+fi
+
+exec /usr/bin/wdisplays "$@"

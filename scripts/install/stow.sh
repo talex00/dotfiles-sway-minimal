@@ -68,6 +68,7 @@ deploy_stow() {
     # Ensure all scripts have executable bits
     [ -d "$target_home/.config/sway/scripts" ] && chmod +x "$target_home/.config/sway/scripts"/*.sh 2>/dev/null || true
     [ -d "$target_home/.config/sway/scripts/helpers" ] && chmod +x "$target_home/.config/sway/scripts/helpers"/*.sh 2>/dev/null || true
+    [ -d "$target_home/.local/bin" ] && chmod +x "$target_home/.local/bin"/* 2>/dev/null || true
     msg_ok "Dotfiles deployed successfully."
 }
 
