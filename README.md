@@ -98,7 +98,7 @@ sh ~/.config/sway/scripts/look.sh menu      # интерактивное Fuzzel-
 | Панель | `waybar` |
 | Лаунчер | `fuzzel` |
 | Уведомления | `swaync` (пакет `sway-notification-center`) |
-| Блокировка | `swaylock-effects` (сборка, не apt) |
+| Блокировка | `gtklock` (штатный пакет, прозрачный fallback к `swaylock`) |
 | Обои / idle | `swaybg`, `swayidle` |
 | Файлы | `thunar` |
 | Буфер | `wl-clipboard`, `cliphist` |
@@ -113,13 +113,60 @@ sh ~/.config/sway/scripts/look.sh menu      # интерактивное Fuzzel-
 
 ## Установка
 
-Большинство пакетов в `universe`. На обычном десктопе он уже включён.
+### Универсальный установщик (Universal Installer)
+
+Проект оснащён модульным установщиком без внешних зависимостей (чистый POSIX/Bash), который поддерживает несколько дистрибутивов Linux:
+
+| Дистрибутив | Пакетный менеджер | Статус поддержки | Особенности |
+| --- | --- | --- | --- |
+| **Ubuntu 24.04 LTS (noble)** | `apt` | **Tested** | Основная целевая платформа, 100% протестировано |
+| **Debian Stable (bookworm)** | `apt` | **Implemented** | Совместимые пакеты; pipx для autotiling |
+| **Fedora (40/41)** | `dnf` | **Implemented** | Нативные пакеты Fedora, pipx/copr |
+| **Arch Linux** | `pacman` | **Implemented** | Официальные репозитории Arch |
+
+#### 1. Проверка окружения (`--check`)
+Проверяет наличие установленных core- и optional-пакетов, статус GNU Stow и возможные конфликты:
+```bash
+./install.sh --check
+```
+
+#### 2. Симуляция установки (`--dry-run`)
+Показывает полный план действий без внесения изменений в систему:
+```bash
+./install.sh --dry-run
+```
+
+#### 3. Полная установка (`--install`)
+Выполняет установку недостающих пакетов через системный пакетный менеджер, безопасно развёртывает dotfiles и инициализирует Theme Engine 2.0:
+```bash
+./install.sh --install
+```
+Флаг `--no-optional` позволяет установить только базовые системные компоненты без апплетов и вспомогательных утилит.
+
+#### Безопасность и GNU Stow
+- **Без сворачивания папок (`--no-folding`)**: GNU Stow создаёт атомарные символические ссылки на отдельные файлы, а не целые папки, предотвращая коллизии.
+- **Автоматический бэкап конфликтов**: Если в `~/.config` уже есть реальные пользовательские файлы, установщик не перезаписывает их, а автоматически перемещает в `~/.config/sway-minimal-backup-<timestamp>`.
+- **Инициализация тем**: Сразу после развёртывания запускается `look.sh ensure`, создающий базовые state-файлы и палитры для активной темы.
+
+#### Удаление (`./uninstall.sh`)
+Позволяет в любой момент чисто удалить символические ссылки dotfiles, сохраняя персональные данные и бэкапы:
+```bash
+./uninstall.sh --dry-run   # Просмотр плана удаления
+./uninstall.sh --remove    # Неинтерактивное удаление symlinks
+```
+
+---
+
+### Ручная установка пакетов (Ubuntu 24.04 noble)
+
+Большинство пакетов доступно в стандартном репозитории `universe`:
 
 ```bash
 sudo apt update
 sudo apt install -y \
   sway swayidle swaybg \
   waybar foot fuzzel sway-notification-center \
+  gtklock \
   grim slurp wl-clipboard cliphist \
   gammastep brightnessctl playerctl \
   jq stow fish \
@@ -134,20 +181,12 @@ sudo apt install -y \
 
 ### Шрифты и значки
 
-JetBrains Mono остаётся основным шрифтом Waybar и терминала. Font Awesome
+JetBrains Mono остаётся основным шрифтом экрана блокировки, Waybar и терминала. Font Awesome
 используется для значков панели, Noto Sans — для распространённых письменностей,
 Noto CJK — для китайского, японского и корейского, Noto Color Emoji — для emoji.
 В Waybar задан fallback к этим семействам; для иконок используется совместимый
 с Ubuntu 24.04 Font Awesome 4.7, без требования ставить Nerd Font отдельно.
 После установки шрифтов перезапустите Waybar или выйдите и войдите в Sway.
-
-`apt install sway` может подтянуть stock `swaylock` — его нужно снять, иначе
-собранный `swaylock-effects` не встанет на `/usr/local` первым в PATH, либо
-конфликтует по имени бинарника:
-
-```bash
-sudo apt remove -y swaylock
-```
 
 ### autotiling (нет в apt)
 
@@ -158,21 +197,6 @@ pipx ensurepath
 
 Перелогиньтесь, чтобы `~/.local/bin` попал в PATH вне fish. В `config.fish` путь
 уже добавляется через `fish_add_path`.
-
-### swaylock-effects (нет в apt)
-
-```bash
-sudo apt install -y meson ninja-build pkg-config git scdoc \
-  libwayland-dev wayland-protocols libxkbcommon-dev \
-  libcairo2-dev libgdk-pixbuf-2.0-dev libpam0g-dev
-
-git clone --depth 1 --branch v1.7.0.0 \
-  https://github.com/jirutka/swaylock-effects.git /tmp/swaylock-effects
-meson setup /tmp/swaylock-effects/build /tmp/swaylock-effects
-ninja -C /tmp/swaylock-effects/build
-sudo ninja -C /tmp/swaylock-effects/build install
-swaylock --version
-```
 
 ### fastfetch (нет в apt, опционально)
 
@@ -198,12 +222,10 @@ sudo usermod -aG i2c,video "$USER"
 
 ### sudoers для профилей питания
 
-Подставьте своего пользователя вместо `tai@amicon.lan`.
-
 ```bash
 sudo tee /etc/sudoers.d/power-management << 'EOF'
-tai@amicon.lan ALL=(root) NOPASSWD: /usr/bin/tee /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference
-tai@amicon.lan ALL=(root) NOPASSWD: /usr/bin/tee /sys/system/cpu/cpufreq/boost
+$USER ALL=(root) NOPASSWD: /usr/bin/tee /sys/devices/system/cpu/cpu*/cpufreq/energy_performance_preference
+$USER ALL=(root) NOPASSWD: /usr/bin/tee /sys/system/cpu/cpufreq/boost
 EOF
 sudo chmod 440 /etc/sudoers.d/power-management
 sudo visudo -c -f /etc/sudoers.d/power-management
@@ -248,23 +270,18 @@ stow -R sway foot fuzzel swaync fish thunar xfce xsettingsd
 
 ## Экран блокировки
 
-`swaylock-effects`, те же обои, что на рабочем столе. Путь в конфиг swaylock не
-прописать, поэтому блокировка идёт через `scripts/lock.sh`. Цвета кольца и
-подсветок зависят от выбранной темы (см. «Внешний вид»): `lock.sh` подмешивает
-их флагами из `~/.config/swaylock/theme-colors`, а значения из `swaylock/config`
-остаются фолбэком темы `ice`. Размеры автоматически масштабируются под
-разрешение активного монитора относительно эталона 4K (3840x2160).
+В качестве основного экрана блокировки используется лёгкий, эстетичный и надёжный **gtklock** (GTK3), полностью интегрированный с Theme Engine 2.0.
 
-| Что | Чем задаётся | База (4K) | 1080p |
-| --- | --- | --- | --- |
-| кольцо | `indicator-radius` | `400` | `200` |
-| время | `font-size` | `240` | `120` |
-| дата | `indicator-radius / 6` | ≈ `67` | ≈ `33` |
-| бокс раскладки | `font-size` | `240` | `120` |
-| толщина кольца | `indicator-thickness` | `10` | `5` |
-| `verifying` / `wrong` / `cleared` | `font-size` | скрыты | скрыты |
-
-Шрифт часов — `Inter` (`fonts-inter`). Не нужен — поставьте `font=JetBrains Mono`.
+- **Скрипт вызова**: Блокировка запускается через `Super + L` или скрипт `~/.config/sway/scripts/lock.sh`.
+- **Обои рабочего стола**: Автоматически подхватывает текущие установленные обои (`~/.config/sway/wallpaper`).
+- **Синхронизация тем**: Конфигурация `~/.config/gtklock/style.css` импортирует `theme.css`. При смене темы через `look.sh` (`ice`, `everforest-light`, `dracula`, `windows-xp`) палитра блокировщика мгновенно и атомарно обновляется.
+- **Минималистичный дизайн**: Четкие цифровые часы и дата на шрифте JetBrains Mono, компактное поле ввода пароля со скрытым вводом (`*`), плавный акцентный фокус и отсутствие размытий, лагов и лишних эффектов.
+- **Безопасность сессии**:
+  - Использует протокол захвата ввода Wayland wlroots (`zwlr_input_inhibit_manager_v1`) и overlay-слой layer-shell (`zwlr_layer_shell_v1`) в Sway 1.9.
+  - Аутентификация через стандартный стек PAM Linux (`/etc/pam.d/gtklock` -> `system-auth` / `login`).
+  - Защита от повторного запуска (single-instance check: `pgrep -x gtklock || pgrep -x swaylock`).
+  - Режим демонизации (`lock.sh -d` / `gtklock -d`) для корректной интеграции со `swayidle`.
+- **Прозрачный Fallback**: Если `gtklock` не установлен или явно задана переменная `SWAY_MINIMAL_LOCKER=swaylock`, `lock.sh` автоматически и без ошибок выполняет блокировку через `swaylock`.
 
 ## Мониторы
 
@@ -325,7 +342,7 @@ gir1.2-gtklayershell-0.1` из apt, затем `install.sh` из его репо
 
 Всё применяется на лету и запоминается. Тема — данные в git: папка
 `sway/.config/sway/themes/<имя>/` с фрагментом на каждое приложение (`sway`,
-`waybar.css`, `fuzzel.ini`, `swaync.css`, `foot.ini`, `swaylock`) и маркером
+`waybar.css`, `fuzzel.ini`, `swaync.css`, `foot.ini`, `swaylock`, `gtklock.css`) и маркером
 `family` (`light`/`dark` — от него зависит GTK). Своя тема = скопировать папку
 и поменять цвета. Стили панели — тоже данные: `sway/.config/waybar/styles/`.
 Текущий выбор — state-файлы рядом с конфигами, в git не попадают (как
@@ -340,7 +357,8 @@ gir1.2-gtklayershell-0.1` из apt, затем `install.sh` из его репо
 | swaync | палитра копируется в `~/.config/swaync/theme.css` (импортируется из `style.css`), применяется `swaync-client -rs -R`. В noble swaync 0.9.0: нет группировки уведомлений, `text-empty`, `relative-timestamps`, `control-center-exclusive-zone` и `layer-shell-cover-screen` — этих ключей в `config.json` нет, как и классов `.notification-background`/`.notification-group` в CSS (карточка — сам `.notification`) |
 | fuzzel | у 1.9 include нет (появился в 1.10) — секция `[colors]` переписывается на месте в `~/.config/fuzzel/fuzzel.ini`; конфиг читается при каждом запуске |
 | foot | 1.16 знает только `[colors]` и не умеет переключать темы сигналами — include `theme.ini`, тема применяется к новым окнам |
-| swaylock | цвета флагами из `lock.sh` (читаются при каждой блокировке) |
+| gtklock | палитра `gtklock.css` копируется в `~/.config/gtklock/theme.css` (импортируется из `style.css`); конфиг и стили читаются при каждой блокировке |
+| swaylock | фолбэк-блокировщик: цвета флагами из `lock.sh` (читаются при блокировке) |
 | GTK | тёмность — вариантом встроенной `Adwaita` через `gtk-application-prefer-dark-theme` + `color-scheme` (и `~/.config/gtk-3.0`/`~/.config/gtk-4.0/settings.ini`, и gsettings) |
 
 «На месте» = сначала отцепить stow-симлинк и править локальную копию:
