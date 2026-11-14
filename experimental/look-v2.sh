@@ -832,13 +832,14 @@ menu_appearance() {
     local choice new list theme current other pos val
     local fmenu="$config_home/sway/scripts/helpers/fuzzel-menu.sh"
     while true; do
-        choice=$(printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
+        choice=$(printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
             "🎨 Тема оформления: $(get_current theme)" \
             "📊 Стиль панели: $(get_current bar-style)" \
             "📐 Позиция панели: $(get_current bar-position) ($(layout_of "$(get_current bar-position)"))" \
             "🔲 Режим панели: $(get_current bar-mode)" \
-            "↔️ Отступы (Gaps): $(get_current gaps) px" \
-            "🖼️ Границы (Borders): $(get_current border) px (smart: $(get_current smart-borders))" \
+            "↔️ Отступы окон (Gaps): $(get_current gaps) px" \
+            "🖼️ Толщина рамок: $(get_current border) px" \
+            "🔲 Умные рамки (Smart borders): $(get_current smart-borders)" \
             "🖱️ Курсор: $(cursor_label) (24 px)" \
             "🌄 Обои рабочего стола" \
             "← Назад" |
@@ -900,75 +901,109 @@ menu_appearance() {
                     *) continue ;;
                 esac
                 ;;
-            *"Отступы (Gaps):"*)
+            *"Отступы окон (Gaps):"*)
                 current=$(get_current gaps)
                 list=''
-                for val in 0 4 8 12 16; do
+                for val in 0 2 4 6 8 10 12 16 20 24; do
                     if [[ $val == "$current" ]]; then list="${list}* ${val} px\n"; else list="${list}${val} px\n"; fi
                 done
-                list="${list}Ввести значение вручную...\n← Назад\n"
-                new=$(printf '%b' "$list" | sh "$fmenu" --dmenu -p 'Gaps: ') || continue
+                list="${list}← Назад\n"
+                new=$(printf '%b' "$list" | sh "$fmenu" --dmenu -p 'Gaps px (число): ') || continue
                 new=${new#\* }
-                case "$new" in
-                    *"px") val=${new%% *}; bash "$script" apply gaps "$val" ;;
-                    *"Ввести"*)
-                        val=$(printf '' | sh "$fmenu" --dmenu -p 'Введите отступ в px (0-64): ') || continue
-                        case "$val" in
-                            ''|*[!0-9]*) continue ;;
-                            *) bash "$script" apply gaps "$val" ;;
-                        esac
+                [[ $new != "← Назад" ]] || continue
+                val=${new%% *}
+                case "$val" in
+                    ''|*[!0-9]*) continue ;;
+                    *)
+                        if [[ $val -le 64 ]]; then
+                            bash "$script" apply gaps "$val"
+                        fi
                         ;;
-                    *) continue ;;
                 esac
                 ;;
-            *"Границы (Borders):"*)
+            *"Толщина рамок:"*)
                 current=$(get_current border)
-                local cur_smart=$(get_current smart-borders)
                 list=''
                 for val in 0 1 2 3 4; do
-                    if [[ $val == "$current" ]]; then list="${list}* Толщина: ${val} px\n"; else list="${list}Толщина: ${val} px\n"; fi
+                    if [[ $val == "$current" ]]; then list="${list}* ${val} px\n"; else list="${list}${val} px\n"; fi
                 done
-                if [[ $cur_smart == on ]]; then
-                    list="${list}* Smart borders: on\nSmart borders: off\n"
-                else
-                    list="${list}Smart borders: on\n* Smart borders: off\n"
-                fi
                 list="${list}← Назад\n"
-                new=$(printf '%b' "$list" | sh "$fmenu" --dmenu -p 'Границы: ') || continue
+                new=$(printf '%b' "$list" | sh "$fmenu" --dmenu -p 'Толщина рамок px: ') || continue
+                new=${new#\* }
+                [[ $new != "← Назад" ]] || continue
+                val=${new%% *}
+                case "$val" in
+                    ''|*[!0-9]*) continue ;;
+                    *)
+                        if [[ $val -le 16 ]]; then
+                            bash "$script" apply border "$val"
+                        fi
+                        ;;
+                esac
+                ;;
+            *"Умные рамки (Smart borders):"*)
+                current=$(get_current smart-borders)
+                [[ $current == on ]] && other=off || other=on
+                new=$(printf '* %s\n%s\n← Назад\n' "$current" "$other" | sh "$fmenu" --dmenu -p 'Smart borders: ') || continue
                 new=${new#\* }
                 case "$new" in
-                    *"Толщина: "*)
-                        val=$(printf '%s' "$new" | sed -e 's/Толщина: //' -e 's/ px//')
-                        case "$val" in ''|*[!0-9]*) continue;; esac
-                        bash "$script" apply border "$val"
-                        ;;
-                    *"Smart borders: on"*)
-                        bash "$script" apply smart-borders on
-                        ;;
-                    *"Smart borders: off"*)
-                        bash "$script" apply smart-borders off
-                        ;;
+                    on|off) bash "$script" apply smart-borders "$new" ;;
                     *) continue ;;
                 esac
                 ;;
             *"Курсор:"*)
                 current=$(get_current cursor)
+                local current_family
+                case "$current" in
+                    oreo_*) current_family="Oreo" ;;
+                    *) current_family="Обычный (Adwaita)" ;;
+                esac
                 list=''
-                for val in oreo_blue_cursors oreo_white_cursors oreo_black_cursors oreo_red_cursors oreo_green_cursors Adwaita; do
-                    local lbl
-                    lbl=$(cursor_label "$val")
-                    if [[ $val == "$current" ]]; then list="${list}* ${lbl}\n"; else list="${list}${lbl}\n"; fi
+                for f_item in "Oreo" "Обычный (Adwaita)"; do
+                    if [[ $f_item == "$current_family" ]]; then
+                        list="${list}* ${f_item}\n"
+                    else
+                        list="${list}${f_item}\n"
+                    fi
                 done
                 list="${list}← Назад\n"
                 new=$(printf '%b' "$list" | sh "$fmenu" --dmenu -p 'Курсор: ') || continue
                 new=${new#\* }
                 case "$new" in
-                    "Oreo Blue")  bash "$script" apply cursor oreo_blue_cursors ;;
-                    "Oreo White") bash "$script" apply cursor oreo_white_cursors ;;
-                    "Oreo Black") bash "$script" apply cursor oreo_black_cursors ;;
-                    "Oreo Red")   bash "$script" apply cursor oreo_red_cursors ;;
-                    "Oreo Green") bash "$script" apply cursor oreo_green_cursors ;;
-                    "Adwaita (Default)") bash "$script" apply cursor Adwaita ;;
+                    "Обычный (Adwaita)")
+                        bash "$script" apply cursor Adwaita
+                        ;;
+                    "Oreo")
+                        local cur_color
+                        case "$current" in
+                            oreo_blue_cursors)  cur_color="Blue" ;;
+                            oreo_white_cursors) cur_color="White" ;;
+                            oreo_black_cursors) cur_color="Black" ;;
+                            oreo_red_cursors)   cur_color="Red" ;;
+                            oreo_green_cursors) cur_color="Green" ;;
+                            *) cur_color="" ;;
+                        esac
+                        local color_list=''
+                        for c_item in "Blue" "White" "Black" "Red" "Green"; do
+                            if [[ $c_item == "$cur_color" ]]; then
+                                color_list="${color_list}* Oreo ${c_item}\n"
+                            else
+                                color_list="${color_list}Oreo ${c_item}\n"
+                            fi
+                        done
+                        color_list="${color_list}← Назад\n"
+                        local sel_color
+                        sel_color=$(printf '%b' "$color_list" | sh "$fmenu" --dmenu -p 'Цвет Oreo: ') || continue
+                        sel_color=${sel_color#\* }
+                        case "$sel_color" in
+                            "Oreo Blue")  bash "$script" apply cursor oreo_blue_cursors ;;
+                            "Oreo White") bash "$script" apply cursor oreo_white_cursors ;;
+                            "Oreo Black") bash "$script" apply cursor oreo_black_cursors ;;
+                            "Oreo Red")   bash "$script" apply cursor oreo_red_cursors ;;
+                            "Oreo Green") bash "$script" apply cursor oreo_green_cursors ;;
+                            *) continue ;;
+                        esac
+                        ;;
                     *) continue ;;
                 esac
                 ;;

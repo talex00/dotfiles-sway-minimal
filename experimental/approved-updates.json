@@ -41,7 +41,7 @@
       "path": "sway/.config/sway/config",
       "type": "file",
       "old_sha256": "5b2775c1c7d4fa78133cd5658a7349b442eb7a43d7301327343bb992edc24f0a",
-      "new_sha256": "fc9c8cd8b42f5d883f98762582b68f51255bf3ff16f485453fdfc66eb088998f",
+      "new_sha256": "671b3f3ac782854acfc42118a8c973ea1bc8a43bc358915d6f34c1feaf8275e0",
       "old_mode": 420,
       "new_mode": 420,
       "reason": "Bootstrap calls the production look.sh entry point and suppresses reload during startup ensure. Does not authorize applying migration."

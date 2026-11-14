@@ -32,7 +32,7 @@ exec env SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh $scripts/look.sh ensure
 # ensure повторён в самой цепочке: exec выше и exec_always стартуют
 # параллельно, и только так гарантировано, что theme.css/state.css созданы
 # до старта waybar. Когда state-файлы на месте, ensure — мгновенный no-op.
-exec_always sh -c 'SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh ~/.config/sway/scripts/look.sh ensure; pkill -f "swaync-client -swb" 2>/dev/null; pkill -x waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1'
+exec_always sh -c 'SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh ~/.config/sway/scripts/look.sh ensure; killall -q swaync-client; killall -q waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1'
 
 # Встроенного dwindle в sway нет: autotiling чередует направление split.
 # Абсолютный путь, а не просто `autotiling`: sway стартует не через fish, поэтому
@@ -129,6 +129,9 @@ bindsym --to-code $mod+W exec $scripts/wallpaper.sh
 bindsym --to-code $mod+bracketright exec $scripts/script_selector.sh
 bindsym --to-code $mod+Shift+S exec grim -g "$(slurp)" - | wl-copy
 bindsym --to-code $mod+Ctrl+S exec $scripts/screenshot.sh
+bindsym --to-code $mod+Mod1+r reload
+bindsym --to-code $mod+Mod1+R reload
+bindsym --to-code Ctrl+$mod+Mod1+r reload
 bindsym --to-code Ctrl+$mod+Mod1+R reload
 bindsym --to-code Ctrl+$mod+Mod1+m exec $scripts/toggle-monitors.sh
 bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
