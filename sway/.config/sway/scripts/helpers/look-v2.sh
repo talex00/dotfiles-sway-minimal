@@ -4,16 +4,31 @@
 set -euo pipefail
 umask 077
 script=$(readlink -f -- "$0")
-root=$(CDPATH= cd -- "$(dirname -- "$script")/.." && pwd -P)
+cur=$(CDPATH= cd -- "$(dirname -- "$script")" && pwd -P)
+root=""
+while [[ "$cur" != "/" && -n "$cur" ]]; do
+    if [[ -d "$cur/sway/.config/sway/themes" ]]; then
+        root="$cur"
+        break
+    fi
+    cur=$(dirname -- "$cur")
+done
+[[ -n "$root" ]] || root=$(CDPATH= cd -- "$(dirname -- "$script")/../../../../.." && pwd -P)
 state_home=${XDG_STATE_HOME:-$HOME/.local/state}
 case $state_home in /*) ;; *) echo 'ERROR: XDG_STATE_HOME must be absolute' >&2; exit 2 ;; esac
 config_home=${XDG_CONFIG_HOME:-$HOME/.config}
 case $config_home in /*) ;; *) echo 'ERROR: XDG_CONFIG_HOME must be absolute' >&2; exit 2 ;; esac
 state="$state_home/sway-minimal-v2"
 gens="$state/generations"
-themes="$root/sway/.config/sway/themes"
-styles="$root/sway/.config/waybar/styles"
-legacy="$root/sway/.config/sway/scripts/look.sh"
+if [[ -d "$root/sway/.config/sway/themes" ]]; then
+    themes="$root/sway/.config/sway/themes"
+    styles="$root/sway/.config/waybar/styles"
+    legacy="$root/sway/.config/sway/scripts/look.sh"
+else
+    themes="$config_home/sway/themes"
+    styles="$config_home/waybar/styles"
+    legacy="$config_home/sway/scripts/look.sh"
+fi
 
 if [[ -z ${DBUS_SESSION_BUS_ADDRESS:-} ]]; then
     _rdir="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
@@ -411,11 +426,22 @@ build() (
     # These inputs are copies, not symlinks: the old renderer is untrusted with source files.
     cp -a "$themes" "$h/.config/sway/themes"
     cp -a "$styles" "$h/.config/waybar/styles"
-    cp "$root/sway/.config/waybar/config.jsonc" "$h/.config/waybar/config.jsonc"
-    cp "$root/sway/.config/waybar/style.css" "$h/.config/waybar/style.css"
-    cp "$root/fuzzel/.config/fuzzel/fuzzel.ini" "$h/.config/fuzzel/fuzzel.ini"
-    cp "$root/swaync/.config/swaync/style.css" "$h/.config/swaync/style.css"
-    cp "$root/swaync/.config/swaync/config.json" "$h/.config/swaync/config.json"
+    for item in "sway/.config/waybar/config.jsonc:waybar/config.jsonc" \
+                "sway/.config/waybar/style.css:waybar/style.css" \
+                "fuzzel/.config/fuzzel/fuzzel.ini:fuzzel/fuzzel.ini" \
+                "swaync/.config/swaync/style.css:swaync/style.css" \
+                "swaync/.config/swaync/config.json:swaync/config.json"; do
+        src_repo="$root/${item%%:*}"
+        rel_cfg="${item##*:}"
+        src_cfg="$config_home/$rel_cfg"
+        dest="$h/.config/$rel_cfg"
+        mkdir -p "$(dirname "$dest")"
+        if [[ -f "$src_repo" ]]; then
+            cp "$src_repo" "$dest"
+        elif [[ -f "$src_cfg" ]]; then
+            cp "$src_cfg" "$dest"
+        fi
+    done
     if [[ -n $import_dir ]]; then
         # Preserve local non-generated parts of mutable files as the renderer's
         # input instead of silently replacing them with repository copies.

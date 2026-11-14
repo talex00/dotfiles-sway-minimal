@@ -47,7 +47,7 @@ if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/scripts/install/common.sh" ]; then
 
     # Hand over execution to the local installer with terminal input attached
     echo "Starting Sway Minimal installation..."
-    if [ -e /dev/tty ] && true < /dev/tty 2>/dev/null; then
+    if { [ -e /dev/tty ] && (exec < /dev/tty) 2>/dev/null; }; then
         exec "$TARGET_DIR/install.sh" --install "$@" < /dev/tty
     else
         exec "$TARGET_DIR/install.sh" --install "$@"

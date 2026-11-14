@@ -323,7 +323,7 @@ generate_foot_theme() {
 
     use_modern=0
     if command -v foot >/dev/null 2>&1; then
-        ver=$(foot --version 2>/dev/null | awk '{print $NF}' | tr -cd '0-9.' || true)
+        ver=$(foot --version 2>/dev/null | sed -E 's/.*version:[[:space:]]*([0-9]+\.[0-9]+).*/\1/' || true)
         major=$(echo "$ver" | cut -d. -f1)
         minor=$(echo "$ver" | cut -d. -f2)
         if [ "${major:-0}" -gt 1 ] 2>/dev/null || { [ "${major:-0}" -eq 1 ] && [ "${minor:-0}" -ge 26 ]; } 2>/dev/null; then

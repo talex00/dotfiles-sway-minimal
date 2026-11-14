@@ -144,7 +144,7 @@ deploy_stow() {
 
     # Adapt existing or new theme.ini for foot version (1.16 on Ubuntu vs 1.26+ on Arch)
     if [ -f "$target_home/.config/foot/theme.ini" ] && command -v foot >/dev/null 2>&1; then
-        foot_ver=$(foot --version 2>/dev/null | awk '{print $NF}' | tr -cd '0-9.' || true)
+        foot_ver=$(foot --version 2>/dev/null | sed -E 's/.*version:[[:space:]]*([0-9]+\.[0-9]+).*/\1/' || true)
         foot_maj=$(echo "$foot_ver" | cut -d. -f1)
         foot_min=$(echo "$foot_ver" | cut -d. -f2)
         if [ "${foot_maj:-0}" -gt 1 ] 2>/dev/null || { [ "${foot_maj:-0}" -eq 1 ] && [ "${foot_min:-0}" -ge 26 ]; } 2>/dev/null; then
@@ -204,7 +204,7 @@ bootstrap_theme_engine() {
         SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh "$look_script" ensure || true
         # Adapt foot theme.ini for foot version (1.16 on Ubuntu vs 1.26+ on Arch)
         if [ -f "$target_home/.config/foot/theme.ini" ] && command -v foot >/dev/null 2>&1; then
-            foot_ver=$(foot --version 2>/dev/null | awk '{print $NF}' | tr -cd '0-9.' || true)
+            foot_ver=$(foot --version 2>/dev/null | sed -E 's/.*version:[[:space:]]*([0-9]+\.[0-9]+).*/\1/' || true)
             foot_maj=$(echo "$foot_ver" | cut -d. -f1)
             foot_min=$(echo "$foot_ver" | cut -d. -f2)
             if [ "${foot_maj:-0}" -gt 1 ] 2>/dev/null || { [ "${foot_maj:-0}" -eq 1 ] && [ "${foot_min:-0}" -ge 26 ]; } 2>/dev/null; then
