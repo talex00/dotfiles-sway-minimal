@@ -88,7 +88,7 @@ map_package() {
                 slurp)                 printf 'slurp' ;;
                 wl-clipboard)          printf 'wl-clipboard' ;;
                 font-jetbrains-mono)   printf 'ttf-jetbrains-mono' ;;
-                font-font-awesome)     printf 'ttf-font-awesome' ;;
+                font-font-awesome)     printf 'otf-font-awesome' ;;
                 jq)                    printf 'jq' ;;
                 swaync)                printf 'swaync' ;;
                 cliphist)              printf 'cliphist' ;;
@@ -147,8 +147,9 @@ install_packages() {
             sudo dnf install -y $packages
             ;;
         pacman)
+            # Refresh repository databases (-y) to ensure valid download URLs on rolling-release mirrors
             # shellcheck disable=SC2086
-            sudo pacman -S --needed --noconfirm $packages
+            sudo pacman -Sy --needed --noconfirm $packages
             ;;
         *)
             msg_err "Unknown package manager: $pkg_mgr"

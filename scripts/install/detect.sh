@@ -37,7 +37,7 @@ detect_distro() {
             PKG_FAMILY="fedora"
             SUPPORT_STATUS="Implemented"
             ;;
-        arch|manjaro|endeavouros)
+        arch|manjaro|endeavouros|cachyos)
             PKG_MANAGER="pacman"
             PKG_FAMILY="arch"
             SUPPORT_STATUS="Implemented"

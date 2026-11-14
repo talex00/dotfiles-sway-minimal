@@ -39,10 +39,16 @@ backup_conflicting_paths() {
             cd "$repo_dir/$pkg"
             find . -type f | while IFS= read -r relpath; do
                 target_file="$target_home/${relpath#./}"
-                if [ -e "$target_file" ] && [ ! -L "$target_file" ]; then
+                if [ -e "$target_file" ] || [ -L "$target_file" ]; then
+                    if [ -L "$target_file" ]; then
+                        link_target=$(readlink "$target_file" 2>/dev/null || true)
+                        case "$link_target" in
+                            *"$repo_dir"*|*"$pkg"*) continue ;;
+                        esac
+                    fi
                     backup_dest="$backup_root/$pkg/${relpath#./}"
                     mkdir -p "$(dirname "$backup_dest")"
-                    cp -a "$target_file" "$backup_dest"
+                    cp -P -a "$target_file" "$backup_dest" 2>/dev/null || true
                     rm -f "$target_file"
                     backup_made=1
                 fi
