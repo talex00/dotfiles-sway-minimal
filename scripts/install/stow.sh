@@ -166,6 +166,38 @@ deploy_stow() {
         xdg-mime default thunar.desktop x-scheme-handler/trash 2>/dev/null || true
         xdg-mime default thunar.desktop x-scheme-handler/file 2>/dev/null || true
     fi
+
+    # Configure virtual machine display environment (VMware / VirtualBox / QEMU / KVM)
+    is_vm=0
+    if command -v systemd-detect-virt >/dev/null 2>&1 && systemd-detect-virt -q; then
+        is_vm=1
+    elif [ -f /sys/class/dmi/id/product_name ] && grep -qiE "vmware|virtualbox|qemu|kvm" /sys/class/dmi/id/product_name 2>/dev/null; then
+        is_vm=1
+    fi
+
+    if [ "$is_vm" -eq 1 ]; then
+        msg_info "Virtual machine detected: configuring Wayland software cursor..."
+        if [ -w /etc/environment ] 2>/dev/null; then
+            grep -q "WLR_NO_HARDWARE_CURSORS" /etc/environment 2>/dev/null || printf 'WLR_NO_HARDWARE_CURSORS=1\n' >> /etc/environment
+        elif command -v sudo >/dev/null 2>&1; then
+            if ! grep -q "WLR_NO_HARDWARE_CURSORS" /etc/environment 2>/dev/null; then
+                printf 'WLR_NO_HARDWARE_CURSORS=1\n' | sudo tee -a /etc/environment >/dev/null 2>&1 || true
+            fi
+        fi
+        for prof in "$target_home/.profile" "$target_home/.bash_profile"; do
+            if [ -f "$prof" ] && ! grep -q "WLR_NO_HARDWARE_CURSORS" "$prof"; then
+                printf '\nexport WLR_NO_HARDWARE_CURSORS=1\n' >> "$prof"
+            fi
+        done
+    fi
+
+    # Ensure default cursor fallback theme exists
+    if [ ! -f "$target_home/.icons/default/index.theme" ]; then
+        mkdir -p "$target_home/.icons/default"
+        cur_fallback="oreo_blue_cursors"
+        [ -d "$target_home/.icons/$cur_fallback" ] || cur_fallback="Adwaita"
+        printf '[Icon Theme]\nName=Default\nComment=Default Cursor Theme\nInherits=%s\n' "$cur_fallback" > "$target_home/.icons/default/index.theme"
+    fi
     msg_ok "Dotfiles deployed successfully."
 }
 
