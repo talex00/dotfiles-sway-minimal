@@ -4,7 +4,49 @@
 
 set -eu
 
-REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Self-bootstrap when run remotely (e.g., via curl -fsSL ... | bash)
+REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd || true)
+if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/scripts/install/common.sh" ]; then
+    GIT_REPO_URL="${SWAY_MINIMAL_REPO:-https://github.com/talex00/dotfiles-sway-minimal.git}"
+    GIT_BRANCH="${SWAY_MINIMAL_BRANCH:-main}"
+    TARGET_DIR="${SWAY_MINIMAL_DIR:-$HOME/.dotfiles-sway-minimal}"
+
+    printf "\033[1;34m::\033[0m \033[1mSway Minimal — Remote One-Line Installer\033[0m\n"
+    printf "Target directory: %s\n" "$TARGET_DIR"
+
+    # Ensure git is available
+    if ! command -v git >/dev/null 2>&1; then
+        echo "Git is required but not installed. Attempting installation..."
+        if command -v apt-get >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y git
+        elif command -v dnf >/dev/null 2>&1; then
+            sudo dnf install -y git
+        elif command -v pacman >/dev/null 2>&1; then
+            sudo pacman -Sy --noconfirm git
+        else
+            echo "Error: Please install git and re-run this script." >&2
+            exit 1
+        fi
+    fi
+
+    # Clone or update the repository
+    if [ -d "$TARGET_DIR/.git" ]; then
+        echo "Updating existing repository in $TARGET_DIR..."
+        (cd "$TARGET_DIR" && git checkout "$GIT_BRANCH" && git pull --rebase)
+    else
+        echo "Cloning Sway Minimal repository ($GIT_BRANCH)..."
+        git clone -b "$GIT_BRANCH" "$GIT_REPO_URL" "$TARGET_DIR"
+    fi
+
+    # Hand over execution to the local installer with terminal input attached
+    echo "Starting Sway Minimal installation..."
+    if [ -t 0 ] || [ ! -e /dev/tty ]; then
+        exec "$TARGET_DIR/install.sh" --install "$@"
+    else
+        exec "$TARGET_DIR/install.sh" --install "$@" < /dev/tty
+    fi
+fi
+
 TARGET_HOME="${HOME}"
 
 # Load helper modules

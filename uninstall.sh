@@ -4,7 +4,22 @@
 
 set -eu
 
-REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+# Self-bootstrap when run remotely (e.g., via curl -fsSL ... | bash)
+REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd || true)
+if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/scripts/install/common.sh" ]; then
+    TARGET_DIR="${SWAY_MINIMAL_DIR:-$HOME/.dotfiles-sway-minimal}"
+    if [ -f "$TARGET_DIR/uninstall.sh" ]; then
+        if [ -t 0 ] || [ ! -e /dev/tty ]; then
+            exec "$TARGET_DIR/uninstall.sh" --remove "$@"
+        else
+            exec "$TARGET_DIR/uninstall.sh" --remove "$@" < /dev/tty
+        fi
+    else
+        echo "Error: Sway Minimal repository not found at $TARGET_DIR." >&2
+        exit 1
+    fi
+fi
+
 TARGET_HOME="${HOME}"
 
 . "$REPO_DIR/scripts/install/common.sh"
