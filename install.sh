@@ -203,6 +203,7 @@ packages_to_install=$(printf '%s' "$packages_to_install" | tr '\n' ' ' | sed 's/
 
 if [ -n "$packages_to_install" ]; then
     install_packages "$PKG_MANAGER" "$packages_to_install"
+    command -v fc-cache >/dev/null 2>&1 && fc-cache -f >/dev/null 2>&1 || true
 else
     msg_ok "All required packages are already installed."
 fi

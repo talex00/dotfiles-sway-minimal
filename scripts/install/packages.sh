@@ -3,7 +3,7 @@
 # Logical components mapped to distro package names
 
 # Core logical components (essential for minimal desktop)
-CORE_COMPONENTS="sway waybar foot fuzzel gtklock stow fish swaybg swayidle grim slurp wl-clipboard font-jetbrains-mono font-font-awesome jq"
+CORE_COMPONENTS="sway waybar foot fuzzel gtklock stow fish swaybg swayidle grim slurp wl-clipboard font-jetbrains-mono font-font-awesome font-emoji jq"
 
 # Optional logical components (enhancements, tray applets, tools)
 OPTIONAL_COMPONENTS="swaync cliphist thunar nm-applet blueman lxpolkit gammastep brightnessctl wdisplays autotiling"
@@ -31,6 +31,7 @@ map_package() {
                 wl-clipboard)          printf 'wl-clipboard' ;;
                 font-jetbrains-mono)   printf 'fonts-jetbrains-mono' ;;
                 font-font-awesome)     printf 'fonts-font-awesome' ;;
+                font-emoji)            printf 'fonts-noto-color-emoji' ;;
                 jq)                    printf 'jq' ;;
                 swaync)                printf 'sway-notification-center' ;;
                 cliphist)              printf 'cliphist' ;;
@@ -60,6 +61,7 @@ map_package() {
                 wl-clipboard)          printf 'wl-clipboard' ;;
                 font-jetbrains-mono)   printf 'jetbrains-mono-fonts' ;;
                 font-font-awesome)     printf 'fontawesome-fonts' ;;
+                font-emoji)            printf 'google-noto-color-emoji-fonts' ;;
                 jq)                    printf 'jq' ;;
                 swaync)                printf 'sway-notification-center' ;;
                 cliphist)              printf 'cliphist' ;;
@@ -89,6 +91,7 @@ map_package() {
                 wl-clipboard)          printf 'wl-clipboard' ;;
                 font-jetbrains-mono)   printf 'ttf-jetbrains-mono' ;;
                 font-font-awesome)     printf 'otf-font-awesome' ;;
+                font-emoji)            printf 'noto-fonts-emoji' ;;
                 jq)                    printf 'jq' ;;
                 swaync)                printf 'swaync' ;;
                 cliphist)              printf 'cliphist' ;;

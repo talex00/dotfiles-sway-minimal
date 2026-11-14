@@ -625,7 +625,28 @@ reload_session() {
     fi
     timeout 10 swaymsg "gaps inner all set $gaps" >/dev/null 2>&1 || true
     if pgrep -x swaync >/dev/null 2>&1; then
-        timeout 10 swaync-client -rs -R >/dev/null || return 1
+        timeout 10 swaync-client -rs -R >/dev/null 2>&1 || timeout 5 swaync-client -rs >/dev/null 2>&1 || true
+    fi
+    # Broadcast theme colors to active foot terminals via OSC escape sequences
+    local theme_file="$config_home/foot/theme.ini"
+    if [[ -f $theme_file ]]; then
+        local bg fg osc_seq="" i col
+        bg=$(grep -E '^[[:space:]]*background=' "$theme_file" | head -n1 | cut -d'=' -f2 | tr -d '[:space:]')
+        fg=$(grep -E '^[[:space:]]*foreground=' "$theme_file" | head -n1 | cut -d'=' -f2 | tr -d '[:space:]')
+        [[ -n $bg ]] && osc_seq="${osc_seq}\033]11;#${bg}\007"
+        [[ -n $fg ]] && osc_seq="${osc_seq}\033]10;#${fg}\007"
+        for ((i=0; i<8; i++)); do
+            col=$(grep -E "^[[:space:]]*regular${i}=" "$theme_file" | head -n1 | cut -d'=' -f2 | tr -d '[:space:]')
+            [[ -n $col ]] && osc_seq="${osc_seq}\033]4;${i};#${col}\007"
+            col=$(grep -E "^[[:space:]]*bright${i}=" "$theme_file" | head -n1 | cut -d'=' -f2 | tr -d '[:space:]')
+            [[ -n $col ]] && osc_seq="${osc_seq}\033]4;$((i+8));#${col}\007"
+        done
+        if [[ -n $osc_seq ]]; then
+            for pts in /dev/pts/[0-9]*; do
+                [[ -w $pts ]] || continue
+                printf "%b" "$osc_seq" > "$pts" 2>/dev/null || true
+            done
+        fi
     fi
     return 0
 }

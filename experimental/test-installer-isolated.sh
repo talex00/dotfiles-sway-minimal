@@ -72,6 +72,14 @@ else
     exit 1
 fi
 
+# Verify swaync config and style are stowed
+if [ -L "$mock_home/.config/swaync/style.css" ] && [ -L "$mock_home/.config/swaync/config.json" ]; then
+    echo "PASS: swaync style.css and config.json are stowed"
+else
+    echo "FAIL: swaync files are not stowed"
+    exit 1
+fi
+
 # Verify Thunar is configured as default file manager
 if grep -q 'thunar.desktop' "$mock_home/.config/mimeapps.list" 2>/dev/null; then
     echo "PASS: Thunar configured as default file manager in mimeapps.list"

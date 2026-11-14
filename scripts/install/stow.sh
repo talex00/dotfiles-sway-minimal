@@ -2,7 +2,7 @@
 # Sway Minimal — GNU Stow Integration and Configuration Deployment
 # Safe deployment without folding symlinks or overwriting user files
 
-STOW_PACKAGES="fish foot fuzzel sway thunar xfce"
+STOW_PACKAGES="fish foot fuzzel sway swaync thunar xfce"
 
 check_stow_conflicts() {
     repo_dir="$1"
