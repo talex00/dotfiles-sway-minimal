@@ -316,8 +316,34 @@ EOF
         cp "$themes/$theme/swaync.css" "$HOME/.config/swaync/theme.css"
     }
 
-    # foot 1.16 (noble): include есть, но только [colors]; тема у новых окон.
-    cp "$themes/$theme/foot.ini" "$HOME/.config/foot/theme.ini"
+generate_foot_theme() {
+    src_foot="$1"
+    dest_foot="$2"
+    mkdir -p "$(dirname "$dest_foot")"
+
+    use_modern=0
+    if command -v foot >/dev/null 2>&1; then
+        ver=$(foot --version 2>/dev/null | awk '{print $NF}' | tr -cd '0-9.' || true)
+        major=$(echo "$ver" | cut -d. -f1)
+        minor=$(echo "$ver" | cut -d. -f2)
+        if [ "${major:-0}" -gt 1 ] 2>/dev/null || { [ "${major:-0}" -eq 1 ] && [ "${minor:-0}" -ge 26 ]; } 2>/dev/null; then
+            use_modern=1
+        fi
+    fi
+
+    if [ "$use_modern" -eq 1 ]; then
+        # Foot >= 1.26 (Arch Linux, etc.) requires [colors-dark] and [colors-light] instead of [colors]
+        sed -e 's/\r$//' -e 's/^\[colors\]/[colors-dark]/' "$src_foot" > "$dest_foot"
+        printf '\n[colors-light]\n' >> "$dest_foot"
+        grep -E '^[a-zA-Z0-9]+=' "$src_foot" | sed 's/\r$//' >> "$dest_foot" || true
+    else
+        # Foot <= 1.25 (e.g. 1.16 on Ubuntu 24.04 noble) requires [colors]
+        sed 's/\r$//' "$src_foot" > "$dest_foot"
+    fi
+}
+
+    # foot: 1.16 (noble) требует [colors]; 1.26+ (Arch) требует [colors-dark]/[colors-light]
+    generate_foot_theme "$themes/$theme/foot.ini" "$HOME/.config/foot/theme.ini"
 
     cp "$themes/$theme/swaylock" "$HOME/.config/swaylock/theme-colors"
     if [ -f "$themes/$theme/gtklock.css" ]; then

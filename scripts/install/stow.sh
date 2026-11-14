@@ -142,6 +142,20 @@ deploy_stow() {
     [ -d "$target_home/.config/sway/scripts/helpers" ] && chmod +x "$target_home/.config/sway/scripts/helpers"/*.sh 2>/dev/null || true
     [ -d "$target_home/.local/bin" ] && chmod +x "$target_home/.local/bin"/* 2>/dev/null || true
 
+    # Adapt existing or new theme.ini for foot version (1.16 on Ubuntu vs 1.26+ on Arch)
+    if [ -f "$target_home/.config/foot/theme.ini" ] && command -v foot >/dev/null 2>&1; then
+        foot_ver=$(foot --version 2>/dev/null | awk '{print $NF}' | tr -cd '0-9.' || true)
+        foot_maj=$(echo "$foot_ver" | cut -d. -f1)
+        foot_min=$(echo "$foot_ver" | cut -d. -f2)
+        if [ "${foot_maj:-0}" -gt 1 ] 2>/dev/null || { [ "${foot_maj:-0}" -eq 1 ] && [ "${foot_min:-0}" -ge 26 ]; } 2>/dev/null; then
+            if grep -q '^\[colors\]' "$target_home/.config/foot/theme.ini" 2>/dev/null; then
+                sed -i -e 's/\r$//' -e 's/^\[colors\]/[colors-dark]/' "$target_home/.config/foot/theme.ini"
+                printf '\n[colors-light]\n' >> "$target_home/.config/foot/theme.ini"
+                grep -E '^[a-zA-Z0-9]+=' "$target_home/.config/foot/theme.ini" | sed 's/\r$//' >> "$target_home/.config/foot/theme.ini" || true
+            fi
+        fi
+    fi
+
     # Register Thunar as default file manager for directories and file schemes
     if command -v xdg-mime >/dev/null 2>&1; then
         xdg-mime default thunar.desktop inode/directory 2>/dev/null || true
@@ -188,6 +202,19 @@ bootstrap_theme_engine() {
         msg_info "Initializing Theme Engine 2.0 (ensure baseline configuration)..."
         chmod +x "$look_script" 2>/dev/null || true
         SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh "$look_script" ensure || true
+        # Adapt foot theme.ini for foot version (1.16 on Ubuntu vs 1.26+ on Arch)
+        if [ -f "$target_home/.config/foot/theme.ini" ] && command -v foot >/dev/null 2>&1; then
+            foot_ver=$(foot --version 2>/dev/null | awk '{print $NF}' | tr -cd '0-9.' || true)
+            foot_maj=$(echo "$foot_ver" | cut -d. -f1)
+            foot_min=$(echo "$foot_ver" | cut -d. -f2)
+            if [ "${foot_maj:-0}" -gt 1 ] 2>/dev/null || { [ "${foot_maj:-0}" -eq 1 ] && [ "${foot_min:-0}" -ge 26 ]; } 2>/dev/null; then
+                if grep -q '^\[colors\]' "$target_home/.config/foot/theme.ini" 2>/dev/null; then
+                    sed -i -e 's/\r$//' -e 's/^\[colors\]/[colors-dark]/' "$target_home/.config/foot/theme.ini"
+                    printf '\n[colors-light]\n' >> "$target_home/.config/foot/theme.ini"
+                    grep -E '^[a-zA-Z0-9]+=' "$target_home/.config/foot/theme.ini" | sed 's/\r$//' >> "$target_home/.config/foot/theme.ini" || true
+                fi
+            fi
+        fi
         msg_ok "Theme Engine initialized."
     fi
 }
