@@ -89,13 +89,18 @@ for theme in ice everforest-light dracula windows-xp; do
     run set theme "$theme"
     [[ $(cat "$state/current/preferences/theme") == "$theme" ]] || fail "theme $theme"
 done
-for style in pragmatic neumorphism cards glass windows-xp; do
+for style in pragmatic glass windows-xp; do
     run set bar-style "$style"
     [[ $(cat "$state/current/preferences/bar-style") == "$style" ]] || fail "style $style"
     variant="$state/current/render-home/.config/waybar/style-variant.css"
+    conf="$state/current/render-home/.config/waybar/config.jsonc"
     if [[ $style == pragmatic ]]; then
         grep -Fq 'font-size: 13px' "$variant" || fail 'pragmatic style font size'
         grep -Fq 'font-weight: 600' "$variant" || fail 'pragmatic launcher weight'
+        ! grep -Fq 'пуск' "$conf" || fail 'pragmatic style must not include пуск'
+    elif [[ $style == glass ]]; then
+        grep -Fq 'font-size: 13px' "$variant" || fail 'glass style font size'
+        ! grep -Fq 'пуск' "$conf" || fail 'glass style must not include пуск'
     elif [[ $style == windows-xp ]]; then
         grep -Fq 'font-family: "JetBrains Mono"' "$variant" || fail 'Windows XP style UI font'
         grep -Fq 'font-size: 13px' "$variant" || fail 'Windows XP style font size'
@@ -128,7 +133,7 @@ run set bar-style pragmatic
 run set bar-mode edge
 run set bar-position top
 first=$(readlink "$state/current")
-echo 'PASS: four themes and five styles generated'
+echo 'PASS: four themes and three styles generated'
 cp "$root/sway/.config/sway/themes/ice/fuzzel.ini" "$testdir/fuzzel.bak"
 printf '\nbackground=NOTHEX\n' >> "$root/sway/.config/sway/themes/ice/fuzzel.ini"
 count_before=$(find "$state/generations" -mindepth 1 -maxdepth 1 -type d | wc -l)

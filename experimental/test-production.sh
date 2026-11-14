@@ -49,7 +49,7 @@ mkdir -p "$cfg/sway" "$cfg/waybar" "$cfg/foot" "$cfg/fuzzel" "$cfg/swaync" "$cfg
          "$cfg/gtk-3.0" "$cfg/gtk-4.0" "$cfg/sway/themes" "$cfg/waybar/styles"
 ln -s "$root/sway/.config/sway/scripts" "$cfg/sway/scripts"
 cp "$root/sway/.config/sway/config" "$cfg/sway/config"
-for entry in theme=everforest-light border=2 smart-borders=on gaps=0 bar-mode=edge bar-style=cards bar-position=top cursor=oreo_blue_cursors; do
+for entry in theme=everforest-light border=2 smart-borders=on gaps=0 bar-mode=edge bar-style=pragmatic bar-position=top cursor=oreo_blue_cursors; do
     printf '%s\n' "${entry#*=}" > "$cfg/sway/${entry%%=*}"
 done
 printf 'seat * xcursor_theme oreo_blue_cursors 24\n' > "$cfg/sway/look"
@@ -206,7 +206,11 @@ grep -qx 'theme=everforest-light' "$tmp/status.out" || fail 'status output'
 sh "$cfg/sway/scripts/look.sh" themes > "$tmp/themes.out" || fail 'themes command'
 grep -qx 'dracula' "$tmp/themes.out" || fail 'themes output'
 sh "$cfg/sway/scripts/look.sh" styles > "$tmp/styles.out" || fail 'styles command'
-grep -qx 'cards' "$tmp/styles.out" || fail 'styles output'
+grep -qx 'pragmatic' "$tmp/styles.out" || fail 'styles output pragmatic'
+grep -qx 'glass' "$tmp/styles.out" || fail 'styles output glass'
+grep -qx 'windows-xp' "$tmp/styles.out" || fail 'styles output windows-xp'
+! grep -qx 'cards' "$tmp/styles.out" || fail 'cards style should be removed'
+! grep -qx 'neumorphism' "$tmp/styles.out" || fail 'neumorphism style should be removed'
 sh "$cfg/sway/scripts/look.sh" --help > "$tmp/help.out" || fail 'help command'
 grep -q 'ensure' "$tmp/help.out" || fail 'help output'
 echo 'PASS: legacy look.sh CLI surface remains available'

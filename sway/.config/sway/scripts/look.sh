@@ -183,10 +183,9 @@ generate() {
     if [ "$layout" = vertical ]; then
         case $bar_style in
             pragmatic)   size_val=25 ;;
-            neumorphism) size_val=36 ;;
-            cards|glass) size_val=34 ;;
+            glass)       size_val=34 ;;
             windows-xp)  size_val=30 ;;
-            *)           size_val=34 ;;
+            *)           size_val=30 ;;
         esac
         size_key="width"
         clock_fmt='{:%H\n%M}'
@@ -212,10 +211,9 @@ generate() {
     else
         case $bar_style in
             pragmatic)   size_val=26 ;;
-            neumorphism) size_val=34 ;;
-            cards|glass) size_val=32 ;;
+            glass)       size_val=32 ;;
             windows-xp)  size_val=28 ;;
-            *)           size_val=32 ;;
+            *)           size_val=28 ;;
         esac
         size_key="height"
         clock_fmt='{:%H:%M}'
@@ -238,9 +236,9 @@ generate() {
         fi
     fi
 
-    # custom/ubuntu: "пуск" отображается ТОЛЬКО для темы windows-xp в горизонтальной раскладке.
-    # В вертикальной раскладке (left/right) и во всех остальных темах — только компактная иконка "".
-    if [ "$theme" = "windows-xp" ] && [ "$layout" = horizontal ]; then
+    # custom/ubuntu: "пуск" отображается ТОЛЬКО для темы windows-xp в стиле windows-xp в горизонтальной раскладке.
+    # Во всех остальных случаях (стили glass/pragmatic, другие темы, вертикальная ориентация) — только компактная иконка "".
+    if [ "$theme" = "windows-xp" ] && [ "$bar_style" = "windows-xp" ] && [ "$layout" = horizontal ]; then
         ubuntu_fmt="  пуск"
     else
         ubuntu_fmt=""
@@ -526,7 +524,7 @@ case ${1:-menu} in
             Bar\ style:*)
                 current=$(get "$f_bar_style" pragmatic)
                 list=""
-                for s in pragmatic neumorphism cards glass windows-xp; do
+                for s in pragmatic glass windows-xp; do
                     if [ "$s" = "$current" ]; then
                         list="${list}* ${s}\n"
                     else
@@ -535,7 +533,7 @@ case ${1:-menu} in
                 done
                 new=$(printf '%b' "$list" | "$fmenu" --dmenu -p 'Bar style: ')
                 new=${new#\* }
-                case $new in pragmatic|neumorphism|cards|glass|windows-xp) ;; *) exit 0 ;; esac
+                case $new in pragmatic|glass|windows-xp) ;; *) exit 0 ;; esac
                 printf '%s\n' "$new" > "$f_bar_style"
                 generate
                 reload
