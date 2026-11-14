@@ -2,7 +2,7 @@
 # Sway Minimal — GNU Stow Integration and Configuration Deployment
 # Safe deployment without folding symlinks or overwriting user files
 
-STOW_PACKAGES="fish foot fuzzel sway"
+STOW_PACKAGES="fish foot fuzzel sway thunar xfce"
 
 check_stow_conflicts() {
     repo_dir="$1"
@@ -69,6 +69,13 @@ deploy_stow() {
     [ -d "$target_home/.config/sway/scripts" ] && chmod +x "$target_home/.config/sway/scripts"/*.sh 2>/dev/null || true
     [ -d "$target_home/.config/sway/scripts/helpers" ] && chmod +x "$target_home/.config/sway/scripts/helpers"/*.sh 2>/dev/null || true
     [ -d "$target_home/.local/bin" ] && chmod +x "$target_home/.local/bin"/* 2>/dev/null || true
+
+    # Register Thunar as default file manager for directories and file schemes
+    if command -v xdg-mime >/dev/null 2>&1; then
+        xdg-mime default thunar.desktop inode/directory 2>/dev/null || true
+        xdg-mime default thunar.desktop x-scheme-handler/trash 2>/dev/null || true
+        xdg-mime default thunar.desktop x-scheme-handler/file 2>/dev/null || true
+    fi
     msg_ok "Dotfiles deployed successfully."
 }
 

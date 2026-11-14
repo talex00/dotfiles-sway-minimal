@@ -49,6 +49,14 @@ else
     exit 1
 fi
 
+# Verify Thunar is configured as default file manager
+if grep -q 'thunar.desktop' "$mock_home/.config/mimeapps.list" 2>/dev/null; then
+    echo "PASS: Thunar configured as default file manager in mimeapps.list"
+else
+    echo "FAIL: Thunar not in mimeapps.list"
+    exit 1
+fi
+
 echo "=== Test 5: uninstall.sh --remove ==="
 bash "$repo_dir/uninstall.sh" --remove
 
