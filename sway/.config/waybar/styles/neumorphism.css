@@ -1,11 +1,11 @@
 /* Стиль Neumorphism: мягкий светотеневой объем, эффект выпуклости/вдавленности */
 
 * {
-    font-size: 10px;
+    font-size: 13px;
 }
 
 #custom-ubuntu {
-    font-size: 19px;
+    font-size: 15px;
     padding: 2px 0;
     margin: 3px 2px;
     color: #e95420;
@@ -60,7 +60,7 @@
 window#waybar.horizontal #custom-ubuntu,
 window#waybar.top #custom-ubuntu,
 window#waybar.bottom #custom-ubuntu {
-    padding: 0 11px 0 5px;
+    padding: 0 8px 0 4px;
     margin: 3px 3px;
 }
 

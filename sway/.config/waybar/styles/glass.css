@@ -1,7 +1,7 @@
 /* Стиль Glassmorphism: полупрозрачная основа и матовые плашки модулей */
 
 * {
-    font-size: 10px;
+    font-size: 13px;
 }
 
 window#waybar {
@@ -9,7 +9,7 @@ window#waybar {
 }
 
 #custom-ubuntu {
-    font-size: 18px;
+    font-size: 15px;
     padding: 2px 0;
     margin: 2px 2px;
     color: #e95420;
@@ -69,7 +69,7 @@ window#waybar {
 window#waybar.horizontal #custom-ubuntu,
 window#waybar.top #custom-ubuntu,
 window#waybar.bottom #custom-ubuntu {
-    padding: 0 11px 0 5px;
+    padding: 0 8px 0 4px;
     margin: 3px 3px;
 }
 

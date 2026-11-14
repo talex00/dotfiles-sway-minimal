@@ -1,7 +1,7 @@
 # Тема ice — светлая (белый фон, голубой акцент). Значения совпадают с
 # базовым config: он остаётся фолбэком на случай отсутствия сгенерированного
 # look-файла. indicator = border: полоса направления сплита отключена.
-client.focused          #33ccff #33ccff #ffffff #33ccff #33ccff
+client.focused          #0284c7 #0284c7 #ffffff #0284c7 #0284c7
 client.focused_inactive #595959 #595959 #ffffff #595959 #595959
 client.unfocused        #595959 #595959 #ffffff #595959 #595959
 client.urgent           #ff0000 #ff0000 #ffffff #ff0000 #ff0000

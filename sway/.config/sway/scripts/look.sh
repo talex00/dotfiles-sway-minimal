@@ -185,7 +185,7 @@ generate() {
             pragmatic)   size_val=25 ;;
             neumorphism) size_val=36 ;;
             cards|glass) size_val=34 ;;
-            windows-xp)  size_val=30 ;;
+            windows-xp)  size_val=64 ;;
             *)           size_val=34 ;;
         esac
         size_key="width"
