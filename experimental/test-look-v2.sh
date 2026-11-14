@@ -109,6 +109,12 @@ for bar in edge floating; do
         conf="$state/current/render-home/.config/waybar/config.jsonc"
         actual=$(sed '/^[[:space:]]*\/\//d' "$conf" | jq -r '.position')
         [[ $actual == "$pos" ]] || fail "bar position $pos"
+        if [[ $pos == top || $pos == bottom ]]; then
+            grep -Fq '"  пуск"' "$conf" || fail 'horizontal XP bar must include пуск'
+        else
+            ! grep -Fq 'пуск' "$conf" || fail 'vertical XP bar must not include пуск'
+            grep -Fq '' "$conf" || fail 'vertical XP bar missing icon'
+        fi
         css="$state/current/render-home/.config/waybar/state.css"
         if [[ $bar == floating ]]; then grep -q 'border:' "$css" || fail 'floating border missing';
         else [[ ! -s $css ]] || fail 'edge unexpectedly has floating border'; fi
@@ -116,6 +122,8 @@ for bar in edge floating; do
 done
 echo 'PASS: both bar modes and four positions'
 run set theme ice
+conf="$state/current/render-home/.config/waybar/config.jsonc"
+! grep -Fq 'пуск' "$conf" || fail 'ice theme must not include пуск'
 run set bar-style pragmatic
 run set bar-mode edge
 run set bar-position top

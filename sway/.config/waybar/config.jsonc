@@ -20,11 +20,13 @@
     "modules-center": ["sway/window"],
     "modules-right": ["sway/language", "keyboard-state", "tray", "pulseaudio", "custom/notification", "clock", "battery"],
 
+    // === look.sh:custom-ubuntu ===
     "custom/ubuntu": {
-        "format": "  пуск",
+        "format": "",
         "on-click": "~/.config/sway/scripts/helpers/fuzzel-menu.sh",
         "tooltip": false
     },
+    // === конец look.sh:custom-ubuntu ===
 
     "sway/workspaces": {
         "all-outputs": true,

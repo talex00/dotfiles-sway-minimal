@@ -185,7 +185,7 @@ generate() {
             pragmatic)   size_val=25 ;;
             neumorphism) size_val=36 ;;
             cards|glass) size_val=34 ;;
-            windows-xp)  size_val=64 ;;
+            windows-xp)  size_val=30 ;;
             *)           size_val=34 ;;
         esac
         size_key="width"
@@ -238,11 +238,34 @@ generate() {
         fi
     fi
 
-    # config.jsonc: позиция, размер, margins, sway/window и clock — перепись
+    # custom/ubuntu: "пуск" отображается ТОЛЬКО для темы windows-xp в горизонтальной раскладке.
+    # В вертикальной раскладке (left/right) и во всех остальных темах — только компактная иконка "".
+    if [ "$theme" = "windows-xp" ] && [ "$layout" = horizontal ]; then
+        ubuntu_fmt="  пуск"
+    else
+        ubuntu_fmt=""
+    fi
+
+    # config.jsonc: позиция, размер, margins, custom/ubuntu, sway/window и clock — перепись
     # блоков между маркерами (awk-файл блока, чтобы не бороться с экранами
     # в sed-заменах строк с \n внутри JSON-строк).
     waybar_conf="$HOME/.config/waybar/config.jsonc"
     delink "$waybar_conf"
+    if ! grep -q "=== look.sh:custom-ubuntu ===" "$waybar_conf"; then
+        awk '
+            /"custom\/ubuntu": \{/ {
+                print "    // === look.sh:custom-ubuntu ==="
+                in_block = 1
+            }
+            in_block && /\},/ {
+                print
+                print "    // === конец look.sh:custom-ubuntu ==="
+                in_block = 0
+                next
+            }
+            { print }
+        ' "$waybar_conf" > "$waybar_conf.tmp" && mv "$waybar_conf.tmp" "$waybar_conf"
+    fi
     tmp=$(mktemp -d)
     cat > "$tmp/bar" << EOF
     "position": "$bar_pos",
@@ -251,6 +274,13 @@ generate() {
     "margin-bottom": $mb,
     "margin-left": $ml,
     "margin-right": $mr,
+EOF
+    cat > "$tmp/ubuntu" << EOF
+    "custom/ubuntu": {
+        "format": "$ubuntu_fmt",
+        "on-click": "~/.config/sway/scripts/helpers/fuzzel-menu.sh",
+        "tooltip": false
+    },
 EOF
     cat > "$tmp/window" << EOF
     "sway/window": {
@@ -267,6 +297,7 @@ EOF
     },
 EOF
     replace_block "$waybar_conf" "=== look.sh:bar ===" "=== конец look.sh:bar ===" "$tmp/bar"
+    replace_block "$waybar_conf" "=== look.sh:custom-ubuntu ===" "=== конец look.sh:custom-ubuntu ===" "$tmp/ubuntu"
     replace_block "$waybar_conf" "=== look.sh:window ===" "=== конец look.sh:window ===" "$tmp/window"
     replace_block "$waybar_conf" "=== look.sh:clock ===" "=== конец look.sh:clock ===" "$tmp/clock"
     rm -rf "$tmp"
