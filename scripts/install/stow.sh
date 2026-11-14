@@ -13,10 +13,8 @@ check_stow_conflicts() {
     for pkg in $STOW_PACKAGES; do
         if [ -d "$repo_dir/$pkg" ]; then
             if ! output=$(cd "$repo_dir" && stow -n -v -t "$target_home" --no-folding "$pkg" 2>&1); then
-                # Check if error mentions conflict
                 if echo "$output" | grep -qi "conflict"; then
-                    msg_warn "Package '$pkg' has stow conflicts:"
-                    echo "$output" | grep -i "conflict" | sed 's/^/  /'
+                    msg_info "Package '$pkg': existing configuration detected (will be backed up and updated)."
                     conflicts=$((conflicts + 1))
                 fi
             fi
@@ -29,35 +27,100 @@ backup_conflicting_paths() {
     repo_dir="$1"
     target_home="$2"
     backup_root="$target_home/.config/sway-minimal-backup-$(date +%Y%m%d-%H%M%S)"
-    backup_made=0
+    backup_marker="$backup_root/.backup_created"
 
-    # Scan for files in repo that already exist as real files (not links) in target_home
-    for pkg in $STOW_PACKAGES; do
-        [ -d "$repo_dir/$pkg" ] || continue
-        # Find all files in package
-        (
-            cd "$repo_dir/$pkg"
-            find . -type f | while IFS= read -r relpath; do
-                target_file="$target_home/${relpath#./}"
-                if [ -e "$target_file" ] || [ -L "$target_file" ]; then
-                    if [ -L "$target_file" ]; then
-                        link_target=$(readlink "$target_file" 2>/dev/null || true)
-                        case "$link_target" in
-                            *"$repo_dir"*|*"$pkg"*) continue ;;
-                        esac
-                    fi
-                    backup_dest="$backup_root/$pkg/${relpath#./}"
-                    mkdir -p "$(dirname "$backup_dest")"
-                    cp -P -a "$target_file" "$backup_dest" 2>/dev/null || true
-                    rm -f "$target_file"
-                    backup_made=1
-                fi
-            done
-        )
+    # Known directory paths from previous versions that may have been folded into directory symlinks
+    KNOWN_FOLDED_DIRS="
+        .config/fish
+        .config/foot
+        .config/fuzzel
+        .config/sway
+        .config/waybar
+        .config/gtklock
+        .config/swaylock
+        .config/swaync
+        .config/Thunar
+        .config/xfce4
+        .config/xsettingsd
+        .icons
+    "
+
+    # Phase 1: Unlink any folded directory symlinks from previous dotfiles installations.
+    # Folded directory symlinks (e.g. ~/.config/fish -> .../fish/.config/fish) cause Stow
+    # to fail with 'existing target is not owned by stow' because --no-folding requires
+    # atomic file symlinks inside real directories.
+    for reldir in $KNOWN_FOLDED_DIRS; do
+        target_dir="$target_home/$reldir"
+        if [ -L "$target_dir" ]; then
+            old_dest=$(readlink -f "$target_dir" 2>/dev/null || readlink "$target_dir" || true)
+            msg_info "Unlinking folded directory symlink from previous version: $reldir"
+            if [ -n "$old_dest" ] && [ -d "$old_dest" ]; then
+                mkdir -p "$backup_root/old_folded/$reldir"
+                cp -a "$old_dest/." "$backup_root/old_folded/$reldir/" 2>/dev/null || true
+                mkdir -p "$backup_root"
+                touch "$backup_marker"
+            fi
+            rm -f "$target_dir"
+            mkdir -p "$target_dir"
+        fi
     done
 
-    if [ "$backup_made" -eq 1 ]; then
-        msg_ok "Existing non-symlink configuration files backed up to: $backup_root"
+    # Check all other directory paths in packages to ensure real directories exist
+    for pkg in $STOW_PACKAGES; do
+        [ -d "$repo_dir/$pkg" ] || continue
+        find_dirs=$(cd "$repo_dir/$pkg" && find . -type d)
+        for d in $find_dirs; do
+            [ "$d" != "." ] || continue
+            reldir="${d#./}"
+            target_dir="$target_home/$reldir"
+            if [ -L "$target_dir" ]; then
+                msg_info "Unlinking folded directory symlink: $reldir"
+                old_dest=$(readlink -f "$target_dir" 2>/dev/null || true)
+                if [ -n "$old_dest" ] && [ -d "$old_dest" ]; then
+                    mkdir -p "$backup_root/old_folded/$reldir"
+                    cp -a "$old_dest/." "$backup_root/old_folded/$reldir/" 2>/dev/null || true
+                    mkdir -p "$backup_root"
+                    touch "$backup_marker"
+                fi
+                rm -f "$target_dir"
+                mkdir -p "$target_dir"
+            elif [ ! -d "$target_dir" ]; then
+                mkdir -p "$target_dir"
+            fi
+        done
+    done
+
+    # Phase 2: Check all regular files in each package for conflicts
+    for pkg in $STOW_PACKAGES; do
+        [ -d "$repo_dir/$pkg" ] || continue
+        find_files=$(cd "$repo_dir/$pkg" && find . -type f)
+        for f in $find_files; do
+            relfile="${f#./}"
+            target_file="$target_home/$relfile"
+
+            if [ -L "$target_file" ]; then
+                # Target is an existing symlink
+                curr_target=$(readlink -f "$target_file" 2>/dev/null || true)
+                our_file=$(readlink -f "$repo_dir/$pkg/$relfile" 2>/dev/null || true)
+                if [ "$curr_target" != "$our_file" ]; then
+                    # Foreign or broken symlink: safely remove it so stow can link cleanly
+                    rm -f "$target_file"
+                fi
+            elif [ -f "$target_file" ]; then
+                # Real regular file: back it up safely
+                backup_dest="$backup_root/$pkg/$relfile"
+                mkdir -p "$(dirname "$backup_dest")"
+                cp -a "$target_file" "$backup_dest"
+                rm -f "$target_file"
+                mkdir -p "$backup_root"
+                touch "$backup_marker"
+            fi
+        done
+    done
+
+    if [ -f "$backup_marker" ]; then
+        rm -f "$backup_marker"
+        msg_ok "Previous configurations safely backed up to: $backup_root"
     fi
 }
 
@@ -68,7 +131,10 @@ deploy_stow() {
     msg_info "Deploying dotfiles with GNU Stow (no-folding)..."
     for pkg in $STOW_PACKAGES; do
         if [ -d "$repo_dir/$pkg" ]; then
-            (cd "$repo_dir" && stow --no-folding -t "$target_home" "$pkg")
+            if ! (cd "$repo_dir" && stow --no-folding -t "$target_home" "$pkg" 2>/dev/null); then
+                # Attempt restow if target had identical existing link or needs refresh
+                (cd "$repo_dir" && stow -R --no-folding -t "$target_home" "$pkg")
+            fi
         fi
     done
     # Ensure all scripts have executable bits

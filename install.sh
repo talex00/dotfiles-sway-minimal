@@ -146,8 +146,8 @@ else
     if check_stow_conflicts "$REPO_DIR" "$TARGET_HOME"; then
         msg_ok "No conflicts detected. Ready to stow."
     else
-        msg_warn "Some existing configuration files would conflict with Stow."
-        msg_info "Installer will automatically back up conflicting files before stowing."
+        msg_info "Existing desktop configuration detected (e.g. from previous dotfiles version)."
+        msg_info "Installer will automatically back up old files and replace folded links cleanly."
     fi
 fi
 

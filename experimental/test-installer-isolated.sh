@@ -17,9 +17,17 @@ bash "$repo_dir/install.sh" --check
 echo "=== Test 2: install.sh --dry-run ==="
 bash "$repo_dir/install.sh" --dry-run
 
-echo "=== Test 3: simulate pre-existing config conflict ==="
+echo "=== Test 3: simulate pre-existing config conflict and folded directory symlinks ==="
 mkdir -p "$mock_home/.config/sway"
 echo "custom_user_file_content" > "$mock_home/.config/sway/config"
+
+# Simulate folded directory symlinks from previous dotfiles version
+fake_old_repo=$(mktemp -d /tmp/fake_old_repo.XXXXXX)
+mkdir -p "$fake_old_repo/fish/.config/fish" "$fake_old_repo/foot/.config/foot"
+echo "old fish config" > "$fake_old_repo/fish/.config/fish/config.fish"
+echo "old foot config" > "$fake_old_repo/foot/.config/foot/foot.ini"
+ln -s "$fake_old_repo/fish/.config/fish" "$mock_home/.config/fish"
+ln -s "$fake_old_repo/foot/.config/foot" "$mock_home/.config/foot"
 
 echo "=== Test 4: install.sh --install ==="
 bash "$repo_dir/install.sh" --install
@@ -38,6 +46,21 @@ if [ -L "$mock_home/.config/sway/config" ]; then
     echo "PASS: .config/sway/config is a symlink"
 else
     echo "FAIL: .config/sway/config is not a symlink"
+    exit 1
+fi
+
+# Verify folded directory symlink was converted to real directory and individual file symlinked
+if [ -d "$mock_home/.config/fish" ] && [ ! -L "$mock_home/.config/fish" ]; then
+    echo "PASS: .config/fish is a real directory (unfolded)"
+else
+    echo "FAIL: .config/fish is not a real directory"
+    exit 1
+fi
+
+if [ -L "$mock_home/.config/fish/config.fish" ]; then
+    echo "PASS: .config/fish/config.fish is an atomic symlink"
+else
+    echo "FAIL: .config/fish/config.fish is not a symlink"
     exit 1
 fi
 
