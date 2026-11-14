@@ -32,7 +32,14 @@ if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/scripts/install/common.sh" ]; then
     # Clone or update the repository
     if [ -d "$TARGET_DIR/.git" ]; then
         echo "Updating existing repository in $TARGET_DIR..."
-        (cd "$TARGET_DIR" && git fetch origin "$GIT_BRANCH" && git reset --hard "origin/$GIT_BRANCH" && git clean -fd)
+        (
+            cd "$TARGET_DIR"
+            git fetch origin "$GIT_BRANCH"
+            git reset --hard
+            git clean -fd
+            git checkout -B "$GIT_BRANCH" "origin/$GIT_BRANCH"
+            git reset --hard "origin/$GIT_BRANCH"
+        )
     else
         echo "Cloning Sway Minimal repository ($GIT_BRANCH)..."
         git clone -b "$GIT_BRANCH" "$GIT_REPO_URL" "$TARGET_DIR"
