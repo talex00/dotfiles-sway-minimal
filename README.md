@@ -1,4 +1,25 @@
-# dotfiles-sway-ubuntu-minimal
+# Sway Minimal Desktop (Dotfiles)
+
+Универсальная легковесная среда на базе Sway (Wayland) с модульным Theme Engine 2.0, поддержкой **Ubuntu 24.04 LTS**, **Arch Linux**, **Debian** и **Fedora**.
+
+## Автоматическая установка в одну команду (One-Line Remote Install)
+
+После установки чистой ОС (Ubuntu или Arch Linux) достаточно выполнить одну команду в терминале:
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/talex00/dotfiles-sway-minimal/main/install.sh)"
+```
+или
+```bash
+curl -fsSL https://raw.githubusercontent.com/talex00/dotfiles-sway-minimal/main/install.sh | bash
+```
+
+Скрипт автоматически:
+- Определит дистрибутив и менеджер пакетов (`pacman` / `apt` / `dnf`).
+- Установит все необходимые зависимости, шрифты (`JetBrains Mono`, `Font Awesome`, `Noto Color Emoji`) и утилиты (`xdg-utils`, `xwayland`).
+- Настроит `Thunar` как системный файловый менеджер по умолчанию (для Firefox, Chrome и системного D-Bus).
+- Развернёт конфигурации с помощью GNU Stow без конфликтов со старыми folded-ссылками.
+- Инициализирует тему оформления с автоматической адаптацией под версию `foot` (Foot 1.16 на Ubuntu vs Foot 1.28 на Arch).
 
 ## Быстрые команды
 
