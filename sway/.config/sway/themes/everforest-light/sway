@@ -1,0 +1,6 @@
+# Тема Everforest Light — мягкая тёплая (кремовый фон, оливково-зелёный акцент).
+# indicator = border: полоса направления сплита отключена.
+client.focused          #8da101 #8da101 #fdf6e3 #8da101 #8da101
+client.focused_inactive #bdc3af #bdc3af #5c6a72 #bdc3af #bdc3af
+client.unfocused        #bdc3af #bdc3af #5c6a72 #bdc3af #bdc3af
+client.urgent           #f85552 #f85552 #fdf6e3 #f85552 #f85552

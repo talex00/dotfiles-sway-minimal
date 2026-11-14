@@ -1,0 +1,11 @@
+# Сессия sway + xwayland-satellite (вместо встроенного Xwayland).
+# Общий конфиг — как есть, ниже только дельта satellite.
+include ~/.config/sway/config
+
+# Выключаем встроенный Xwayland: X-окна отдаёт satellite на дисплее :12.
+# DISPLAY=:12 задаёт обёртка sway-satellite.sh (наследует вся сессия).
+xwayland disable
+# XSETTINGS-менеджер для :12 (DPI 144 при масштабе 1.5). Без него Qt/VMware
+# берут 96 DPI из xdpyinfo и рисуют мелко. DISPLAY наследуется из окружения sway.
+exec xsettingsd -c "$HOME/.config/xsettingsd/xsettingsd.conf"
+exec sh -c 'exec "$HOME/.local/bin/xwayland-satellite" :12'

@@ -3,15 +3,16 @@
 * {
     border: none;
     border-radius: 0;
-    font-size: 10px;
+    font-size: 13px;
     margin: 0;
 }
 
-#custom-arch {
-    font-size: 13px;
+#custom-ubuntu {
+    font-size: 15px;
+    font-weight: 600;
     padding: 2px 0;
     margin: 0;
-    color: #1793d1;
+    color: #c7461a;
 }
 
 #workspaces button {
@@ -36,10 +37,10 @@
 }
 
 /* Горизонтальная раскладка */
-window#waybar.horizontal #custom-arch,
-window#waybar.top #custom-arch,
-window#waybar.bottom #custom-arch {
-    padding: 0 6px;
+window#waybar.horizontal #custom-ubuntu,
+window#waybar.top #custom-ubuntu,
+window#waybar.bottom #custom-ubuntu {
+    padding: 0 8px 0 4px;
 }
 
 window#waybar.horizontal #workspaces button,
@@ -72,5 +73,5 @@ window#waybar.bottom #pulseaudio,
 window#waybar.bottom #custom-notification,
 window#waybar.bottom #clock,
 window#waybar.bottom #battery {
-    padding: 0 4px;
+    padding: 0 2px;
 }

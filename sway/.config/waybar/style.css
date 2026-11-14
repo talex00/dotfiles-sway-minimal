@@ -1,5 +1,9 @@
-/* Цвета — в theme.css (пишет look.sh), стиль оформления — в style-variant.css,
-   ободок floating-панели — в state.css. */
+/* Цвета — в theme.css (тема, пишет scripts/look.sh), стиль оформления — в
+   style-variant.css (вариант панели, пишет он же), ободок floating-панели —
+   в state.css. @import допустим только до остальных правил, поэтому эти
+   строки стоят первыми, а сам файл держит лишь структуру: шрифт, отступы,
+   поведение. Без theme.css панель просто остаётся бесцветной до первого
+   запуска look.sh ensure — он есть в автозапуске sway. */
 @import url("theme.css");
 @import url("style-variant.css");
 @import url("state.css");
@@ -7,13 +11,33 @@
 * {
     border: none;
     border-radius: 0;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 10px;
+    font-family: "JetBrains Mono", "FontAwesome", "Noto Sans", monospace;
+    font-size: 13px;
     min-width: 0;
     min-height: 0;
 }
 
-#keyboard-state label.locked {
+#keyboard-state {
+    padding: 0;
+    margin: 0;
+}
+
+#keyboard-state label {
+    padding: 0;
+    margin: 0;
+}
+
+#keyboard-state label.capslock:not(.locked) {
+    margin-top: -4px;
+    padding: 0;
+    font-size: 0px;
+    min-height: 0px;
+    min-width: 0px;
+}
+
+#keyboard-state label.capslock.locked {
+    padding: 2px 0;
+    color: #ff5555;
     font-weight: bold;
 }
 

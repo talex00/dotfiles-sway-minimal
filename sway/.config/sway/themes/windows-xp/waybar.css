@@ -1,0 +1,39 @@
+/* Тема Windows XP Luna Blue. @accent использует state.css (ободок floating-панели). */
+@define-color accent #245edb;
+@define-color bg #245edb;
+@define-color fg #ffffff;
+@define-color muted #c8d8f8;
+@define-color card-bg #184cc3;
+@define-color card-border rgba(0, 0, 0, 0.25);
+@define-color shadow-dark rgba(0, 0, 0, 0.35);
+@define-color shadow-light rgba(255, 255, 255, 0.4);
+
+window#waybar {
+    background: @bg;
+    color: @fg;
+}
+
+#workspaces button {
+    color: #ffffff;
+}
+
+#workspaces button.focused {
+    color: #ffffff;
+}
+
+#workspaces button.urgent {
+    color: #ff5500;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #72ff72;
+}
+
+#battery.critical:not(.charging) {
+    color: #ff6b6b;
+}
+
+@keyframes blink {
+    to { color: #ffffff; }
+}

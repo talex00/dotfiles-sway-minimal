@@ -3,14 +3,11 @@ sway/.config/sway/wallpaper
 fish/.config/fish/fish_variables
 fish/.config/fish/fish_history
 
-# Thunar перезаписывает это сам: размер окна, колонки, сортировка.
-xfce/.config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml
-# thunar-volman пишет сюда те же настройки, которые задаёт scripts/thunar.sh.
-xfce/.config/xfce4/xfconf/xfce-perchannel-xml/thunar-volman.xml
-
-# Машинно-специфичное: выходы и привязка воркспейсов у каждой системы свои.
-# Именно эти два файла по умолчанию пишет nwg-displays.
+# Машинно-специфичное: раскладка мониторов и привязка воркспейсов у каждой системы своя.
+# (Stow может сделать ~/.config/sway симлинком на репозиторий — тогда wdisplays
+# пишет monitors.conf прямо сюда; в git он попасть не должен.)
 sway/.config/sway/outputs
+sway/.config/sway/monitors.conf
 sway/.config/sway/workspaces
 
 # Внешний вид: выбор и сгенерированные state-файлы (scripts/look.sh)
@@ -21,13 +18,22 @@ sway/.config/sway/gaps
 sway/.config/sway/bar-mode
 sway/.config/sway/bar-style
 sway/.config/sway/bar-position
-sway/.config/sway/cursor
+sway/.config/sway/cursor*
 sway/.config/sway/look
 sway/.config/waybar/theme.css
 sway/.config/waybar/style-variant.css
-sway/.config/waybar/state.json
 sway/.config/waybar/state.css
 sway/.config/swaylock/theme-colors
-fuzzel/.config/fuzzel/theme.ini
-swaync/.config/swaync/theme.css
 foot/.config/foot/theme.ini
+swaync/.config/swaync/theme.css
+
+# Временные файлы, кеши, дампы, сокеты, логи
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+.lock*
+__pycache__/
+*.py[cod]
+.pytest_cache/

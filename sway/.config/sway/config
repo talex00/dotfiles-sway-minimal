@@ -1,70 +1,62 @@
 # Sway. Минималистичное окружение: светлая тема, нулевые гэпы, тонкие рамки.
-# Внимание: sway не понимает комментарии в конце строки — только отдельной строкой.
+# Ubuntu 24.04. Внимание: sway не понимает комментарии в конце строки — только отдельной строкой.
 
-# Выходы и привязка воркспейсов машинно-специфичны и в git не лежат. Пути —
-# ровно те, куда nwg-displays пишет по умолчанию (outputs и workspaces, без
-# расширения). Глобы, а не прямые пути: если файла нет, sway не ругается.
-include ~/.config/sway/output*
+# Настройки мониторов не лежат в git: sway читает машинно-локальный файл
+# (его пишет wdisplays, см. README). Глоб нужен не для задания раскладки, а
+# чтобы reload её не сбрасывал: без output-директив sway при reload включает
+# автоконфигурацию wlroots (все мониторы on, лучший mode, scale 1).
+# Глоб: если файлов нет, sway не ругается.
+include ~/.config/sway/monitor*
+
+# Воркспейсы машинно-специфичны и в git не лежат. Глоб: если файла нет, sway не ругается.
 include ~/.config/sway/workspace*
 
 set $mod     Mod4
 set $term    foot
 set $files   thunar
-set $menu    fuzzel
 set $scripts ~/.config/sway/scripts
-
-# X11 — только xwayland-satellite на :0 (rootless, без «мыла» на HiDPI).
-# Встроенный Xwayland sway выключен, чтобы два сервера не делили :0; пакет
-# xorg-xwayland при этом нужен — это бинарь, который запускает satellite.
-xwayland disable
-
-# Диктовка Handy: переключить запись у живого процесса, иначе поднять его.
-set $handy pkill -USR2 -x handy || handy
+set $helpers $scripts/helpers
+set $menu    $helpers/fuzzel-menu.sh
 
 
 # --- Autostart ---
 
-# Первым: остальным X11-приложениям нужен готовый сокет :0.
-exec xwayland-satellite :0
-
-# State-файлы внешнего вида (тема, рамки, gaps): создать недостающие до
-# старта waybar и первого запуска fuzzel/foot — их include'ы ждут эти файлы.
-exec $scripts/look.sh ensure
-
-# Thunar: закладки в сайдбаре и настройки автомонтирования съёмных дисков.
-exec $scripts/thunar.sh ensure
+# Внешний вид: generation engine проверяет/создаёт активное поколение и
+# раскладывает стабильные файлы до старта waybar и первого запуска fuzzel/foot.
+# Через sh: у скрипта после git clone/pull может не оказаться бита +x.
+exec env SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh $scripts/look.sh ensure
 
 # pkill и запуск обязательно в одном sh -c: два отдельных exec_always sway
 # стартует параллельно, и pkill убивает только что поднятый waybar.
 # Редирект в лог тоже обязателен — иначе waybar падает по SIGPIPE.
-exec_always sh -c 'pkill -x waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1'
+# ensure повторён в самой цепочке: exec выше и exec_always стартуют
+# параллельно, и только так гарантировано, что theme.css/state.css созданы
+# до старта waybar. Когда state-файлы на месте, ensure — мгновенный no-op.
+exec_always sh -c 'SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh ~/.config/sway/scripts/look.sh ensure; pkill -f "swaync-client -swb" 2>/dev/null; pkill -x waybar; sleep 0.2; exec waybar >/tmp/waybar.log 2>&1'
 
-# Встроенного dwindle в sway нет: autotiling чередует направление split
-# по соотношению сторон и даёт ту же спираль.
-exec autotiling
+# Встроенного dwindle в sway нет: autotiling чередует направление split.
+# Абсолютный путь, а не просто `autotiling`: sway стартует не через fish, поэтому
+# ~/.local/bin (куда pipx кладёт бинарь) в PATH нет, и поиск по имени не срабатывает.
+# sway выполняет exec через sh -c, поэтому $HOME раскрывается корректно.
+# Не exec_always: при reload демон перезапускать не нужно — sway не убивает
+# exec-процессы, а autotiling подписан на IPC, который переживает reload.
+exec $HOME/.local/bin/autotiling
 
-# swaync стартует через systemd-юнит (WantedBy=graphical-session.target):
-# переживает падение. Дублировать через exec нельзя — будет гонка
-# за org.freedesktop.Notifications с другим демоном уведомлений.
-exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
-exec batsignal -b
+exec swaync
 exec nm-applet --indicator
 exec blueman-applet
-exec $handy
+# Графический диалог пароля для pkexec. polkit-gnome на Sway/Wayland падает.
+exec lxpolkit
 exec wl-paste --type text  --watch cliphist store
 exec wl-paste --type image --watch cliphist store
 exec swaybg -m fill -i "$(cat $HOME/.config/sway/wallpaper 2>/dev/null || echo $HOME/Pictures/Wallpapers/frieren_meme.webp)"
-exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY DISPLAY XDG_CURRENT_DESKTOP=sway
-
-# Гасит eDP-1, если подключён внешний DP-1. Обязательно после
-# dbus-update-activation-environment, иначе swaymsg не найдёт сокет.
-exec $scripts/monitors-fallback.sh
+exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
 # 10 мин → блокировка, +30 с → экран гаснет. Если залочено вручную (Super+L),
-# экран гаснет через 30 с. Sway сам locker не поднимает — зовём lock.sh напрямую.
+# экран гаснет через 5 мин. Sway сам locker не поднимает — зовём lock.sh напрямую.
 # Кавычки вокруг "*" обязательны: swayidle выполняет команды через sh -c.
 exec swayidle -w \
-    timeout 30  'pgrep -x swaylock && swaymsg output "*" dpms off' resume 'swaymsg output "*" dpms on' \
+    timeout 300 'pgrep -x swaylock && swaymsg output "*" dpms off' resume 'swaymsg output "*" dpms on' \
     timeout 600 '$scripts/lock.sh -f' \
     timeout 630 'swaymsg output "*" dpms off'                      resume 'swaymsg output "*" dpms on' \
     before-sleep '$scripts/lock.sh -f'
@@ -77,31 +69,27 @@ default_border pixel 2
 default_floating_border pixel 2
 smart_borders on
 
-# Фокус идёт за мышью, но не перебивает выбор клавиатурой: always повторно
-# фокусировал бы окно под курсором даже после смены фокуса клавишами, и
-# floating-окно под курсором отбирало бы фокус при первом движении мыши.
-# При смене фокуса клавишами курсор переносится в центр нового окна,
-# если он ещё не внутри него (mouse_warping container).
+# yes, не always: иначе клавиатурный фокус (Alt+Tab) отбивается окном под курсором.
+# fuzzel-menu.sh на время меню ставит no, иначе fuzzel закрывается при уходе мыши.
 focus_follows_mouse yes
 mouse_warping container
-seat * xcursor_theme Adwaita
+seat * xcursor_theme Adwaita 24
 
 #                       border  background text    indicator child_border
 client.focused          #33ccff #33ccff    #ffffff #33ccff   #33ccff
-client.focused_inactive #d0d0d0 #d0d0d0    #555555 #d0d0d0   #d0d0d0
-client.unfocused        #d0d0d0 #d0d0d0    #555555 #d0d0d0   #d0d0d0
+client.focused_inactive #595959 #595959    #ffffff #595959   #595959
+client.unfocused        #595959 #595959    #ffffff #595959   #595959
 client.urgent           #ff0000 #ff0000    #ffffff #ff0000   #ff0000
 
 # indicator = border: полоса «куда откроется следующее окно» отключена —
 # отдельной опции у sway нет, а с gaps она выглядит как грань чужого цвета.
 
 # Тема, толщина рамки и gaps подключаются из генерируемого файла (его пишет
-# scripts/look.sh, в git он не лежит). Глоб, как с outputs/workspaces выше:
+# scripts/look.sh, в git он не лежит). Глоб, как с workspaces выше:
 # без файла действуют значения из этого конфига.
 include ~/.config/sway/look*
 
 for_window [app_id="thunar" floating=true] move position center
-for_window [app_id="floating_brightness"] floating enable, resize set 480 260, move position center
 
 
 # --- Input ---
@@ -125,35 +113,35 @@ input type:pointer {
 
 # --- Keys ---
 # --to-code: буквы и цифры работают при любой раскладке.
-# Ctrl+space держит sway глобально, т.к. на Wayland Handy не может перехватить
-# хоткей сам; в настройках Handy нужен режим toggle, а не push-to-talk.
 
 bindsym --to-code $mod+T exec $term
 bindsym --to-code $mod+E exec $files
 bindsym --to-code $mod+D exec $menu
 bindsym --to-code $mod+Q kill
-bindsym --to-code $mod+F fullscreen
+bindsym --to-code $mod+F exec $helpers/toggle-fullscreen.sh
 bindsym --to-code $mod+B floating toggle
 bindsym --to-code $mod+P sticky toggle
 bindsym --to-code $mod+L exec $scripts/lock.sh
 bindsym --to-code $mod+N exec pkill gammastep || gammastep -O 4500
 bindsym --to-code $mod+Shift+N exec swaync-client -t -sw
-bindsym --to-code $mod+V exec cliphist list | $menu --dmenu | cliphist decode | wl-copy
+bindsym --to-code $mod+V exec $helpers/clipboard-menu.sh
 bindsym --to-code $mod+W exec $scripts/wallpaper.sh
 bindsym --to-code $mod+bracketright exec $scripts/script_selector.sh
 bindsym --to-code $mod+Shift+S exec grim -g "$(slurp)" - | wl-copy
 bindsym --to-code $mod+Ctrl+S exec $scripts/screenshot.sh
-bindsym --to-code Ctrl+space exec $handy
 bindsym --to-code Ctrl+$mod+Mod1+R reload
+bindsym --to-code Ctrl+$mod+Mod1+m exec $scripts/toggle-monitors.sh
 bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
 
 floating_modifier $mod normal
 
-# Alt+Tab — цикл по видимым окнам активного воркспейса (включая floating),
-# Shift+Alt+Tab — назад. Нативный focus next/prev в бинарном autotiling-дереве
-# не давал различия вперёд/назад: оба вели к соседнему листу.
-bindsym Mod1+Tab       exec $scripts/window_cycle.sh next
-bindsym Mod1+Shift+Tab exec $scripts/window_cycle.sh prev
+# Круговой цикл по всем окнам workspace, включая плавающие.
+bindsym Mod1+Tab       exec $helpers/cycle-windows.sh next
+bindsym Mod1+Shift+Tab exec $helpers/cycle-windows.sh prev
+
+# Переключение между существующими воркспейсами.
+bindsym $mod+Tab       workspace next
+bindsym $mod+Shift+Tab workspace prev
 
 bindsym $mod+Left  focus left
 bindsym $mod+Right focus right
@@ -168,11 +156,8 @@ bindsym $mod+Shift+Down  move down
 bindsym --whole-window $mod+button4 workspace prev
 bindsym --whole-window $mod+button5 workspace next
 
-bindsym $mod+Tab       workspace next_on_output
-bindsym $mod+Shift+Tab workspace prev_on_output
-
-bindgesture swipe:3:left  workspace next_on_output
-bindgesture swipe:3:right workspace prev_on_output
+bindgesture swipe:3:left  workspace next
+bindgesture swipe:3:right workspace prev
 
 # Воркспейсы: $mod — перейти, +Shift — перенести окно и перейти, +Ctrl — молча.
 # В конфиге sway нет циклов, поэтому 10 строк на группу — минимум возможного.
@@ -221,5 +206,5 @@ bindsym --locked XF86AudioPlay        exec playerctl play-pause
 bindsym --locked XF86AudioPause       exec playerctl play-pause
 bindsym --locked XF86AudioNext        exec playerctl next
 
-bindsym --locked XF86MonBrightnessUp   exec $scripts/brightness.sh up
-bindsym --locked XF86MonBrightnessDown exec $scripts/brightness.sh down
+bindsym XF86MonBrightnessUp   exec $helpers/brightness.sh up
+bindsym XF86MonBrightnessDown exec $helpers/brightness.sh down

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "updates": [
+    {
+      "path": "sway/.config/waybar/config.jsonc",
+      "type": "file",
+      "old_sha256": "3545f7cb47433332c2fe2928c5dc77204a09e53d9145263e18c8e70b56fd1b5e",
+      "new_sha256": "a56d8be831c24e24f836490477a2de6e5f25ab258d5cc9c9bc3e8548f5f28066",
+      "old_mode": 436,
+      "new_mode": 436,
+      "reason": "Use Ubuntu 24.04 Font Awesome glyphs and standard Unicode notification dots instead of Nerd Font-only icons."
+    },
+    {
+      "path": "sway/.config/waybar/style.css",
+      "type": "file",
+      "old_sha256": "2b2ff783a0568b8cc3aa5321f751925836cbc778e74c27a9d914b044ef7c3880",
+      "new_sha256": "d2c0de96faaea01ab27b7daa7326eec34d2dce1452f91c2102ac3fbca9ffa2cc",
+      "old_mode": 420,
+      "new_mode": 420,
+      "reason": "Restore JetBrains Mono as the Waybar font while retaining icon and Noto fallbacks."
+    },
+    {
+      "path": "sway/.config/waybar/styles/pragmatic.css",
+      "type": "file",
+      "old_sha256": "59bbeab8caabfcd89f33324c76ec54e9959f8bed03f9a3e2dedd57831c40e48b",
+      "new_sha256": "1e548a97409bcebc72f3c74073887853c7d328b09638f9cff5321b3a7cc221bf",
+      "old_mode": 420,
+      "new_mode": 420,
+      "reason": "Tighten horizontal module padding while retaining readable text and launcher label."
+    },
+    {
+      "path": "sway/.config/waybar/styles/windows-xp.css",
+      "type": "file",
+      "old_sha256": "ec5f7aac3f22a8866499f6b1a9448b112ac26d30dc541669d587cb6d5f4b60db",
+      "new_sha256": "dd022ca8ef23b822da40e779703ad756fc218e15fa3e93f19f8c80a44f5cc5fc",
+      "old_mode": 420,
+      "new_mode": 420,
+      "reason": "Restore JetBrains Mono, tighten module spacing and use regular-weight XP status text."
+    },
+    {
+      "path": "sway/.config/sway/config",
+      "type": "file",
+      "old_sha256": "5b2775c1c7d4fa78133cd5658a7349b442eb7a43d7301327343bb992edc24f0a",
+      "new_sha256": "fc9c8cd8b42f5d883f98762582b68f51255bf3ff16f485453fdfc66eb088998f",
+      "old_mode": 420,
+      "new_mode": 420,
+      "reason": "Bootstrap calls the production look.sh entry point and suppresses reload during startup ensure. Does not authorize applying migration."
+    },
+    {
+      "path": "sway/.config/sway/scripts/look.sh",
+      "type": "file",
+      "old_sha256": "8b94b22717ded1a32ae4926c4051593929ae2aba1f6afb47b29b7b51103acaee",
+      "new_sha256": "e6f6c33ade68327a7330f9953a9ece6381c482aa616b7ea281af35a0a7e04296",
+      "old_mode": 493,
+      "new_mode": 493,
+      "reason": "Keeps the legacy menu and CLI as a render-only fallback while normal use dispatches to the generation engine. Does not authorize applying migration."
+    },
+    {
+      "path": "sway/.config/sway/scripts/lock.sh",
+      "type": "file",
+      "old_sha256": "68555253388740d0bf5e4bedb5393f936d9e91dd02322766e76123ae099c82c7",
+      "new_sha256": "ae25d19be012fd98ba92646a99549299b53b41d12b5f7c2bd29d261dbece3623",
+      "old_mode": 493,
+      "new_mode": 493,
+      "reason": "When explicitly opted in, read validated lock colours from a pinned v2 generation; retain safe legacy fallback. Does not authorize applying migration."
+    },
+    {
+      "path": "sway/.config/sway/scripts/helpers/fuzzel-menu.sh",
+      "type": "file",
+      "old_sha256": "b8005b2ebfa3241a095f1647c9ceee6baf442f01e1cc6f391d980756ac240739",
+      "new_sha256": "1ce93f7d47dacf45b6ee82f0e8e093794936b602ccb3bb714688e5de15d939b3",
+      "old_mode": 493,
+      "new_mode": 493,
+      "reason": "When explicitly opted in, launch Fuzzel with a pinned v2 generation; otherwise retain legacy behaviour. Does not authorize applying migration."
+    }
+  ]
+}

@@ -5,15 +5,13 @@
     font-size: 11px;
 }
 
-:root {
-    --notification-shadow: none;
-}
-
-/* Fallback переменные для тем */
+/* Фолбэк-переменные для тем (алиасы имён дефолтной темы swaync) */
 @define-color text-color @fg;
 @define-color cc-bg @bg;
 @define-color noti-bg @card-bg;
 @define-color noti-border-color @card-border;
+@define-color noti-close-bg alpha(@fg, 0.1);
+@define-color noti-close-bg-hover alpha(@fg, 0.15);
 
 /* Шторка центра уведомлений */
 .control-center {
@@ -32,42 +30,26 @@
 
 .control-center .notification-row:focus,
 .control-center .notification-row:hover {
-    opacity: 0.95;
     background: transparent;
 }
 
-/* Очистка теней и подложек групп */
+/* Строки без подложек и теней: карточкой выглядит сам .notification
+   (в swaync 0.9.0 из noble нет .notification-background/.notification-group) */
 .notification-row,
 .notification-row:focus,
-.notification-row:hover,
-.notification-group,
-.notification-group:focus,
-.notification-group.collapsed {
+.notification-row:hover {
     background: transparent;
     outline: none;
     box-shadow: none;
 }
 
-.notification-group.collapsed .notification-row .notification {
-    background-color: @card-bg;
-    box-shadow: none;
-    border: 1px solid @card-border;
-}
-
-.control-center .control-center-list .notification,
 .control-center .control-center-list {
-    box-shadow: none;
-    background: transparent;
-}
-
-/* Карточки в истории уведомлений */
-.notification-row .notification-background {
-    padding: 4px 0;
     background: transparent;
     box-shadow: none;
 }
 
-.notification-row .notification-background .notification {
+/* Карточка уведомления */
+.notification {
     background: @card-bg;
     color: @fg;
     border: 1px solid @card-border;
@@ -77,22 +59,27 @@
 }
 
 .notification-default-action {
+    background: @card-bg;
+    color: @fg;
+    border: 1px solid @card-border;
+    border-radius: 6px;
     padding: 6px 8px;
     margin: 0;
     box-shadow: none;
-    background: transparent;
-    border: none;
-    color: @fg;
+}
+
+.notification-default-action:hover {
+    background: @card-bg;
+    color: @accent;
 }
 
 .notification-content {
     background: transparent;
     color: @fg;
+    padding: 4px 6px;
 }
 
 /* Текст уведомления (заголовок, тело, время) */
-.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .summary,
-.floating-notifications .summary,
 .summary {
     color: @fg;
     font-size: 12px;
@@ -101,8 +88,6 @@
     text-shadow: none;
 }
 
-.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .body,
-.floating-notifications .body,
 .body {
     color: @fg;
     font-size: 11px;
@@ -110,18 +95,13 @@
     text-shadow: none;
 }
 
-.notification-row .notification-background .notification .notification-default-action .notification-content .text-box .time,
-.floating-notifications .time,
 .time {
     color: alpha(@fg, 0.6);
     font-size: 10px;
+    font-weight: normal;
     background: transparent;
     text-shadow: none;
-}
-
-.notification-content label,
-.text-box label {
-    color: @fg;
+    margin-right: 8px;
 }
 
 .close-button {
@@ -189,10 +169,6 @@
     box-shadow: none;
 }
 
-.widget-dnd > label {
-    color: @fg;
-}
-
 .widget-dnd > switch {
     border-radius: 10px;
     box-shadow: none;
@@ -202,7 +178,8 @@
     background: @accent;
 }
 
-/* Всплывающие уведомления (popups) */
+/* Всплывающие уведомления (popups): отступ сверху, чтобы не перекрывать
+   горизонтальную панель (margin-top: 44 у центра — по её же высоте) */
 .floating-notifications {
     background: transparent;
     margin-top: 36px;

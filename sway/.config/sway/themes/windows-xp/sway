@@ -1,0 +1,5 @@
+# Тема Windows XP Luna Blue (классический синий заголовок активного окна, серебристо-голубой неактивного).
+client.focused          #0055ea #0055ea #ffffff #0055ea #0055ea
+client.focused_inactive #7a96df #7a96df #ffffff #7a96df #7a96df
+client.unfocused        #7a96df #7a96df #ffffff #7a96df #7a96df
+client.urgent           #ff5500 #ff5500 #ffffff #ff5500 #ff5500

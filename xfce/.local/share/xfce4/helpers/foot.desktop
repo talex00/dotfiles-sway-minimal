@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Icon=foot
+Type=X-XFCE-Helper
+Name=foot
+StartupNotify=false
+X-XFCE-Binaries=foot;
+X-XFCE-Category=TerminalEmulator
+X-XFCE-Commands=foot -D "%s";
+X-XFCE-CommandsWithParameter=foot -D "%s";

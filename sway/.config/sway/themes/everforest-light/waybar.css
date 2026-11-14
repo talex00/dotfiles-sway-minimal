@@ -1,0 +1,40 @@
+/* Everforest Light — мягкая светлая с природным зелёным акцентом.
+   @accent использует state.css (ободок floating-панели). */
+@define-color accent #8da101;
+@define-color bg #fdf6e3;
+@define-color fg #5c6a72;
+@define-color muted #a6b0a0;
+@define-color card-bg #f2eedd;
+@define-color card-border rgba(92, 106, 114, 0.15);
+@define-color shadow-dark rgba(0, 0, 0, 0.12);
+@define-color shadow-light rgba(255, 255, 255, 0.95);
+
+window#waybar {
+    background: @bg;
+    color: @fg;
+}
+
+#workspaces button {
+    color: #a6b0a0;
+}
+
+#workspaces button.focused {
+    color: #3a464c;
+}
+
+#workspaces button.urgent {
+    color: #f85552;
+}
+
+#battery.charging,
+#battery.plugged {
+    color: #8da101;
+}
+
+#battery.critical:not(.charging) {
+    color: #f85552;
+}
+
+@keyframes blink {
+    to { color: #5c6a72; }
+}

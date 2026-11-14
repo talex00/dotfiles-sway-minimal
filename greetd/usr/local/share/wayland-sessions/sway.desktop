@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Sway
-Comment=Sway; X11 через xwayland-satellite
-Exec=/usr/local/share/wayland-sessions/sway.sh
-Type=Application
-DesktopNames=sway
-Keywords=tiling;wm;wayland
