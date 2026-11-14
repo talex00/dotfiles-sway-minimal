@@ -41,7 +41,7 @@
       "path": "sway/.config/sway/config",
       "type": "file",
       "old_sha256": "5b2775c1c7d4fa78133cd5658a7349b442eb7a43d7301327343bb992edc24f0a",
-      "new_sha256": "0bea4703253f4c8908c03274360b0e551a1a45714b9bf81a50d1e18acc8b33fd",
+      "new_sha256": "4903499e445705dbc80a0c2e88f5cea60849a94a8a716a7c783cf50406046e3f",
       "old_mode": 420,
       "new_mode": 420,
       "reason": "Bootstrap calls the production look.sh entry point and suppresses reload during startup ensure. Does not authorize applying migration."
@@ -59,7 +59,7 @@
       "path": "sway/.config/sway/scripts/lock.sh",
       "type": "file",
       "old_sha256": "68555253388740d0bf5e4bedb5393f936d9e91dd02322766e76123ae099c82c7",
-      "new_sha256": "ae25d19be012fd98ba92646a99549299b53b41d12b5f7c2bd29d261dbece3623",
+      "new_sha256": "f15c8c8f475de8f0243f5b9ed380a9243862fe02777188756f919aa72c1c0353",
       "old_mode": 493,
       "new_mode": 493,
       "reason": "When explicitly opted in, read validated lock colours from a pinned v2 generation; retain safe legacy fallback. Does not authorize applying migration."

@@ -1008,32 +1008,9 @@ menu_appearance() {
                 esac
                 ;;
             *"Обои рабочего стола"*)
-                local wpdir="$HOME/Pictures/Wallpapers"
-                list=''
-                if [[ -d $wpdir ]]; then
-                    while IFS= read -r f; do
-                        [[ -n $f ]] && list="${list}${f}\n"
-                    done < <(find "$wpdir" -maxdepth 1 -type f -printf '%P\n' 2>/dev/null | sort)
+                if [[ -x $config_home/sway/scripts/wallpaper.sh ]]; then
+                    "$config_home/sway/scripts/wallpaper.sh"
                 fi
-                list="${list}Сбросить на дефолтные обои\n← Назад\n"
-                new=$(printf '%b' "$list" | sh "$fmenu" --dmenu -p 'Обои: ') || continue
-                case "$new" in
-                    "← Назад") continue ;;
-                    "Сбросить на дефолтные обои")
-                        rm -f "$HOME/.config/sway/wallpaper"
-                        pkill -x swaybg 2>/dev/null || true
-                        sleep 0.1
-                        swaybg -m fill -i "$HOME/Pictures/Wallpapers/frieren_meme.webp" &
-                        ;;
-                    *)
-                        if [[ -f $wpdir/$new ]]; then
-                            printf '%s\n' "$wpdir/$new" > "$HOME/.config/sway/wallpaper"
-                            pkill -x swaybg 2>/dev/null || true
-                            sleep 0.1
-                            swaybg -m fill -i "$wpdir/$new" &
-                        fi
-                        ;;
-                esac
                 ;;
             *"← Назад"*) return 0 ;;
             *) return 0 ;;
@@ -1096,6 +1073,7 @@ menu_desktop() {
                     "Alt + Tab            Переключение окон" \
                     "Super + 1..7         Переключение рабочих столов" \
                     "Super + Shift + 1..7 Перенос окна на рабочий стол" \
+                    "Ctrl + Super + Alt+R Перезагрузка Sway (reload)" \
                     "Ctrl + Alt + Delete  Меню выключения (powermenu)" \
                     "Win + Space          Переключение раскладки (US/RU)" |
                     sh "$fmenu" --dmenu -w 55 -p 'Горячие клавиши: ' || true

@@ -11,6 +11,9 @@ include ~/.config/sway/monitor*
 # Воркспейсы машинно-специфичны и в git не лежат. Глоб: если файла нет, sway не ругается.
 include ~/.config/sway/workspace*
 
+# Обои рабочего стола: генерируется scripts/wallpaper.sh (output * bg ...). Глоб: если файла нет, sway не ругается.
+include ~/.config/sway/wallpaper*
+
 set $mod     Mod4
 set $term    foot
 set $files   thunar
@@ -49,7 +52,7 @@ exec blueman-applet
 exec lxpolkit
 exec wl-paste --type text  --watch cliphist store
 exec wl-paste --type image --watch cliphist store
-exec swaybg -m fill -i "$(cat $HOME/.config/sway/wallpaper 2>/dev/null || echo $HOME/Pictures/Wallpapers/frieren_meme.webp)"
+exec $scripts/wallpaper.sh ensure
 exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
 
 # 10 мин → блокировка, +30 с → экран гаснет. Если залочено вручную (Super+L),

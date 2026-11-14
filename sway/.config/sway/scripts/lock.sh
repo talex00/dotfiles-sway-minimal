@@ -7,9 +7,11 @@
 # а флаги командной строки важнее значений из конфига.
 
 wallpaper=$(cat "$HOME/.config/sway/wallpaper" 2>/dev/null)
-[ -f "$wallpaper" ] || wallpaper="$HOME/Pictures/Wallpapers/frieren_meme.webp"
+if [ ! -f "$wallpaper" ] || [ ! -r "$wallpaper" ]; then
+    wallpaper=$(find "$HOME/Pictures/Wallpapers" -maxdepth 1 -type f \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | sort | head -n1)
+fi
 
-if [ -f "$wallpaper" ] && [ -r "$wallpaper" ]; then
+if [ -n "$wallpaper" ] && [ -f "$wallpaper" ] && [ -r "$wallpaper" ]; then
     set -- -i "$wallpaper" "$@"
 fi
 valid_colors() {
