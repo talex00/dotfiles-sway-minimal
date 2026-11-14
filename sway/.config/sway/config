@@ -12,7 +12,7 @@ include ~/.config/sway/monitor*
 include ~/.config/sway/workspace*
 
 # Обои рабочего стола: генерируется scripts/wallpaper.sh (output * bg ...). Глоб: если файла нет, sway не ругается.
-include ~/.config/sway/wallpaper*
+include ~/.config/sway/wallpaper*.conf
 
 set $mod     Mod4
 set $term    foot
