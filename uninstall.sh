@@ -75,4 +75,3 @@ heading "Uninstallation Complete"
 msg_ok "Sway Minimal dotfiles symlinks have been removed."
 msg_info "Note: User state and preferences remain in ~/.local/state/sway-minimal-v2."
 msg_info "If any backups were created during installation, they are in ~/.config/sway-minimal-backup-*."
-EOF

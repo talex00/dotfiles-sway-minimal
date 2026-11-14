@@ -186,4 +186,3 @@ echo "  4. Customization menu: Super + D -> 'Внешний вид' or run: ~/.c
 echo "  5. Diagnostics: ~/.config/sway/scripts/helpers/doctor.sh"
 echo "  6. To uninstall anytime: ./uninstall.sh --remove"
 printf "\n"
-EOF
