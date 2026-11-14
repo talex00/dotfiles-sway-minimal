@@ -398,6 +398,9 @@ build() (
             val=$(cat "$import_dir/$key")
         fi
         [[ $key != "$change_key" ]] || val=$change_value
+        if [[ $key == "bar-style" && ! -f $styles/$val.css ]]; then
+            val=pragmatic
+        fi
         validate "$key" "$val"
         printf '%s\n' "$val" > "$tmp/preferences/$key"
         cp "$tmp/preferences/$key" "$tmp/render-home/.config/sway/$key"

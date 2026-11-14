@@ -447,13 +447,16 @@ case ${1:-menu} in
            [ ! -f "$HOME/.config/waybar/theme.css" ] ||
            [ ! -f "$HOME/.config/waybar/style-variant.css" ] ||
            [ ! -f "$HOME/.config/waybar/state.css" ] ||
-           [ ! -f "$HOME/.config/swaync/theme.css" ]; then
+           [ ! -f "$HOME/.config/swaync/theme.css" ] ||
+           [ ! -f "$HOME/.config/gtklock/theme.css" ]; then
             [ -f "$f_theme" ]  || printf 'ice\n' > "$f_theme"
             [ -f "$f_border" ] || printf '2\n'    > "$f_border"
             [ -f "$f_smart" ]  || printf 'on\n'   > "$f_smart"
             [ -f "$f_gaps" ]   || printf '0\n'    > "$f_gaps"
             [ -f "$f_bar" ]    || printf 'edge\n' > "$f_bar"
-            [ -f "$f_bar_style" ] || printf 'pragmatic\n' > "$f_bar_style"
+            if [ ! -f "$f_bar_style" ] || [ ! -f "$styles_dir/$(cat "$f_bar_style" 2>/dev/null).css" ]; then
+                printf 'pragmatic\n' > "$f_bar_style"
+            fi
             [ -f "$f_bar_pos" ]  || printf 'left\n' > "$f_bar_pos"
             [ -f "$f_cursor" ] || printf 'oreo_blue_cursors\n' > "$f_cursor"
             generate
