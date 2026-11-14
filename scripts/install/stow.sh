@@ -141,6 +141,10 @@ deploy_stow() {
     [ -d "$target_home/.config/sway/scripts" ] && chmod +x "$target_home/.config/sway/scripts"/*.sh 2>/dev/null || true
     [ -d "$target_home/.config/sway/scripts/helpers" ] && chmod +x "$target_home/.config/sway/scripts/helpers"/*.sh 2>/dev/null || true
     [ -d "$target_home/.local/bin" ] && chmod +x "$target_home/.local/bin"/* 2>/dev/null || true
+    if command -v autotiling >/dev/null 2>&1 && [ ! -e "$target_home/.local/bin/autotiling" ]; then
+        mkdir -p "$target_home/.local/bin"
+        ln -sf "$(command -v autotiling)" "$target_home/.local/bin/autotiling"
+    fi
 
     # Adapt existing or new theme.ini for foot version (1.16 on Ubuntu vs 1.26+ on Arch)
     if [ -f "$target_home/.config/foot/theme.ini" ] && command -v foot >/dev/null 2>&1; then

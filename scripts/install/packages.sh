@@ -3,7 +3,7 @@
 # Logical components mapped to distro package names
 
 # Core logical components (essential for minimal desktop)
-CORE_COMPONENTS="sway waybar foot fuzzel gtklock stow fish swaybg swayidle grim slurp wl-clipboard font-jetbrains-mono font-font-awesome font-emoji jq xdg-utils"
+CORE_COMPONENTS="sway waybar foot fuzzel gtklock stow fish swaybg swayidle grim slurp wl-clipboard font-jetbrains-mono font-font-awesome font-emoji jq xdg-utils xwayland"
 
 # Optional logical components (enhancements, tray applets, tools)
 OPTIONAL_COMPONENTS="swaync cliphist thunar nm-applet blueman lxpolkit gammastep brightnessctl wdisplays autotiling"
@@ -44,6 +44,7 @@ map_package() {
                 wdisplays)             printf 'wdisplays' ;;
                 autotiling)            printf 'pipx' ;;
                 xdg-utils)             printf 'xdg-utils' ;;
+                xwayland)              printf 'xwayland' ;;
             esac
             ;;
         fedora)
@@ -75,6 +76,7 @@ map_package() {
                 wdisplays)             printf 'wdisplays' ;;
                 autotiling)            printf 'pipx' ;;
                 xdg-utils)             printf 'xdg-utils' ;;
+                xwayland)              printf 'xorg-x11-server-Xwayland' ;;
             esac
             ;;
         arch)
@@ -106,6 +108,7 @@ map_package() {
                 wdisplays)             printf 'wdisplays' ;;
                 autotiling)            printf 'autotiling' ;;
                 xdg-utils)             printf 'xdg-utils' ;;
+                xwayland)              printf 'xorg-xwayland' ;;
             esac
             ;;
     esac

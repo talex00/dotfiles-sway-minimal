@@ -43,7 +43,7 @@ exec_always sh -c 'SWAY_MINIMAL_ENSURE_NO_RELOAD=1 sh ~/.config/sway/scripts/loo
 # sway выполняет exec через sh -c, поэтому $HOME раскрывается корректно.
 # Не exec_always: при reload демон перезапускать не нужно — sway не убивает
 # exec-процессы, а autotiling подписан на IPC, который переживает reload.
-exec $HOME/.local/bin/autotiling
+exec sh -c 'command -v autotiling >/dev/null 2>&1 && exec autotiling || [ -x "$HOME/.local/bin/autotiling" ] && exec "$HOME/.local/bin/autotiling"'
 
 exec swaync
 exec nm-applet --indicator

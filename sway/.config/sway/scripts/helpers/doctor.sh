@@ -15,7 +15,7 @@ done
 for cmd in gtklock swaylock grim slurp cliphist wl-paste wl-copy brightnessctl ddcutil wdisplays fish shellcheck shfmt; do
     if command -v "$cmd" >/dev/null 2>&1; then ok "$cmd available"; else warn "$cmd missing (feature or development tool unavailable)"; fi
 done
-if [ -x "$HOME/.local/bin/autotiling" ]; then ok 'autotiling available'; else warn 'autotiling missing'; fi
+if command -v autotiling >/dev/null 2>&1 || [ -x "$HOME/.local/bin/autotiling" ]; then ok 'autotiling available'; else warn 'autotiling missing'; fi
 
 for dir in sway waybar gtklock swaylock fuzzel foot swaync; do
     if [ -L "$config/$dir" ]; then
@@ -38,8 +38,12 @@ style=$(cat "$sway/bar-style" 2>/dev/null || printf pragmatic)
 case "$style" in ''|*[!a-zA-Z0-9_-]*) err 'invalid style name' ;; *)
     if [ -r "$config/waybar/styles/$style.css" ]; then ok "style $style"; else err "style $style missing"; fi ;;
 esac
-wallpaper=$(cat "$sway/wallpaper" 2>/dev/null || printf '%s' "$HOME/Pictures/Wallpapers/frieren_meme.webp")
-if [ -r "$wallpaper" ] && [ -f "$wallpaper" ]; then ok 'wallpaper readable'; else warn "wallpaper not readable: $wallpaper"; fi
+wallpaper=$(cat "$sway/wallpaper" 2>/dev/null || true)
+if [ -n "$wallpaper" ]; then
+    if [ -r "$wallpaper" ] && [ -f "$wallpaper" ]; then ok 'wallpaper readable'; else warn "wallpaper not readable: $wallpaper"; fi
+else
+    info 'wallpaper: using solid color fallback (#1a1b26)'
+fi
 if [ -n "${SWAYSOCK:-}" ]; then
     if swaymsg -t get_version >/dev/null 2>&1; then ok 'Sway IPC reachable'; else warn 'Sway IPC unavailable'; fi
 else info 'SWAYSOCK not set; live IPC not checked'; fi
