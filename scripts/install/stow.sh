@@ -79,8 +79,24 @@ undeploy_stow() {
     for pkg in $STOW_PACKAGES; do
         if [ -d "$repo_dir/$pkg" ]; then
             (cd "$repo_dir" && stow -D -t "$target_home" "$pkg" 2>/dev/null || true)
+            # Ensure all symlinks pointing into this package are removed even if stow aborted due to generated files
+            (
+                cd "$repo_dir/$pkg"
+                find . -type f | while IFS= read -r relpath; do
+                    target_file="$target_home/${relpath#./}"
+                    if [ -L "$target_file" ]; then
+                        dest=$(readlink -f "$target_file" 2>/dev/null || true)
+                        src=$(readlink -f "$repo_dir/$pkg/${relpath#./}" 2>/dev/null || true)
+                        if [ "$dest" = "$src" ]; then
+                            rm -f "$target_file"
+                        fi
+                    fi
+                done
+            )
         fi
     done
+    # Clean up empty directories under target_home/.config
+    find "$target_home/.config" -mindepth 1 -type d -empty -delete 2>/dev/null || true
     msg_ok "Dotfiles symlinks removed."
 }
 
