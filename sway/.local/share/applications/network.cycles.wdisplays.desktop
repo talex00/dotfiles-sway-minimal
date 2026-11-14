@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Displays
+GenericName=Display Settings
+Comment=Configure displays and monitors
+Exec=wdisplays
+Icon=network.cycles.wdisplays
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;
+Keywords=display;screen;resolution;monitors;
