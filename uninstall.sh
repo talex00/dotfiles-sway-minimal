@@ -9,10 +9,10 @@ REPO_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" 2>/dev/null && pwd || true)
 if [ -z "$REPO_DIR" ] || [ ! -f "$REPO_DIR/scripts/install/common.sh" ]; then
     TARGET_DIR="${SWAY_MINIMAL_DIR:-$HOME/.dotfiles-sway-minimal}"
     if [ -f "$TARGET_DIR/uninstall.sh" ]; then
-        if [ -t 0 ] || [ ! -e /dev/tty ]; then
-            exec "$TARGET_DIR/uninstall.sh" --remove "$@"
-        else
+        if [ -e /dev/tty ] && true < /dev/tty 2>/dev/null; then
             exec "$TARGET_DIR/uninstall.sh" --remove "$@" < /dev/tty
+        else
+            exec "$TARGET_DIR/uninstall.sh" --remove "$@"
         fi
     else
         echo "Error: Sway Minimal repository not found at $TARGET_DIR." >&2
