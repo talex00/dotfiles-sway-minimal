@@ -37,8 +37,9 @@ def fixture(base):
     for rel, source in m.ROOTS.items():
         d = old / source; d.mkdir(parents=True)
         (d / ('config.jsonc' if rel == '.config/waybar' else 'fuzzel.ini' if rel == '.config/fuzzel' else 'base.conf')).write_text(f'base for {rel}\n')
-    (old / m.FILES['.local/bin/sway-satellite.sh']).parent.mkdir(parents=True, exist_ok=True)
-    (old / m.FILES['.local/bin/sway-satellite.sh']).write_text('#!/bin/sh\n')
+    for source in m.FILES.values():
+        (old / source).parent.mkdir(parents=True, exist_ok=True)
+        (old / source).write_text('#!/bin/sh\n')
     shutil.copytree(old, new, dirs_exist_ok=True)
     # Untracked state lives inside the old folded directory, as on the real system.
     (old / m.ROOTS['.config/sway'] / 'monitors.conf').write_text('output custom\n')

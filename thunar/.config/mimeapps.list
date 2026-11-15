@@ -1,9 +1,0 @@
-[Default Applications]
-inode/directory=thunar.desktop
-x-scheme-handler/trash=thunar.desktop
-x-scheme-handler/file=thunar.desktop
-
-[Added Associations]
-inode/directory=thunar.desktop;
-x-scheme-handler/trash=thunar.desktop;
-x-scheme-handler/file=thunar.desktop;

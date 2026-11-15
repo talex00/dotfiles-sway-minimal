@@ -169,6 +169,42 @@ window#waybar {
     color: #ffffff;
 }
 
+/* Меню — тоже потомки #tray: белый текст панели не должен попадать
+   на светлый фон меню. Потомки наследуют цвет своего пункта, в том числе
+   при наведении и для недоступных действий. */
+#tray menu {
+    background: #ffffff;
+    color: #000000;
+    border: 1px solid #aca899;
+    padding: 2px;
+    text-shadow: none;
+}
+
+#tray menu * {
+    color: inherit;
+}
+
+#tray menu menuitem {
+    background: transparent;
+    color: #000000;
+    padding: 4px 8px;
+}
+
+#tray menu menuitem:hover {
+    background: #316ac5;
+    color: #ffffff;
+}
+
+#tray menu menuitem:disabled {
+    color: #808080;
+}
+
+#tray menu separator {
+    background: #aca899;
+    min-height: 1px;
+    margin: 3px 2px;
+}
+
 #tray > .passive {
     -gtk-icon-effect: dim;
 }

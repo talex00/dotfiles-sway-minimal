@@ -7,7 +7,10 @@ mkdir -p "$testdir/project" "$testdir/home"
 cp -a "$root/." "$testdir/project/"
 root="$testdir/project"
 export HOME="$testdir/home" XDG_STATE_HOME="$testdir/home/.local/state"
-unset SWAYSOCK WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS || :
+export XDG_CONFIG_HOME="$HOME/.config" XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CACHE_HOME="$HOME/.cache" XDG_RUNTIME_DIR="$testdir/runtime"
+mkdir -m 700 "$XDG_RUNTIME_DIR"
+unset SWAYSOCK WAYLAND_DISPLAY DISPLAY DBUS_SESSION_BUS_ADDRESS DBUS_SESSION_BUS_PID || :
 engine="$root/experimental/look-v2.sh"
 state="$XDG_STATE_HOME/sway-minimal-v2"
 run() { bash "$engine" "$@" >/dev/null; }
@@ -88,6 +91,10 @@ echo 'PASS: validation and rollback'
 for theme in ice everforest-light dracula windows-xp; do
     run set theme "$theme"
     [[ $(cat "$state/current/preferences/theme") == "$theme" ]] || fail "theme $theme"
+    if [[ $theme == windows-xp ]]; then
+        grep -Fxq '@define-color bg #f6f5f4;' "$state/current/render-home/.config/swaync/theme.css" ||
+            fail 'Windows XP notification center must use the neutral Adwaita background'
+    fi
 done
 for style in pragmatic glass windows-xp; do
     run set bar-style "$style"
@@ -105,6 +112,11 @@ for style in pragmatic glass windows-xp; do
         grep -Fq 'font-family: "JetBrains Mono"' "$variant" || fail 'Windows XP style UI font'
         grep -Fq 'font-size: 13px' "$variant" || fail 'Windows XP style font size'
         grep -Fq 'text-shadow: none' "$variant" || fail 'Windows XP text shadow'
+        grep -A 3 -Fx '#tray menu {' "$variant" | grep -Fq 'color: #000000;' || fail 'XP tray menu text contrast'
+        grep -A 3 -Fx '#tray menu {' "$variant" | grep -Fq 'background: #ffffff;' || fail 'XP tray menu background'
+        grep -A 2 -Fx '#tray menu * {' "$variant" | grep -Fq 'color: inherit;' || fail 'XP tray menu labels must inherit item state'
+        grep -A 3 -Fx '#tray menu menuitem:hover {' "$variant" | grep -Fq 'color: #ffffff;' || fail 'XP tray menu selection text'
+        grep -A 2 -Fx '#tray menu menuitem:disabled {' "$variant" | grep -Fq 'color: #808080;' || fail 'XP tray menu disabled text'
     fi
 done
 for bar in edge floating; do

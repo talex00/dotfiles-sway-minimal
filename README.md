@@ -425,7 +425,15 @@ gir1.2-gtklayershell-0.1` из apt, затем `install.sh` из его репо
 
 ## Скрипты
 
-`Super + ]` — интерактивные скрипты из `scripts/*.sh` (и пользовательские вложенные). Служебные хелперы горячих клавиш вынесены в `scripts/helpers/`. Fuzzel идёт через `helpers/fuzzel-menu.sh`.
+`Super + ]` — встроенные скрипты из `scripts/` (включая подпапки) и личные скрипты из `user-scripts/`. Служебные хелперы горячих клавиш вынесены в `scripts/helpers/`. Fuzzel идёт через `helpers/fuzzel-menu.sh`.
+
+Личные скрипты кладите в `~/.config/sway/user-scripts/` (при заданном
+`XDG_CONFIG_HOME` — в `$XDG_CONFIG_HOME/sway/user-scripts/`). В меню они
+появляются с префиксом `user-scripts/`; содержимое этой папки исключено из Git.
+Файлу нужен shebang, например `#!/bin/sh` или `#!/usr/bin/env python3`,
+и право запуска (`chmod +x путь/к/скрипту`). Расширение не важно.
+Скрипты в подпапках открываются в Foot, остальные запускаются в фоне.
+Обновлять конфиг или перезапускать Sway после добавления скрипта не нужно.
 
 | Скрипт | Что делает |
 | --- | --- |
@@ -440,54 +448,36 @@ gir1.2-gtklayershell-0.1` из apt, затем `install.sh` из его репо
 | `helpers/fuzzel-menu.sh` | обёртка fuzzel под `focus_follows_mouse yes` |
 | `helpers/clipboard-menu.sh` | меню истории буфера обмена (cliphist + fuzzel) |
 
-## Xwayland-satellite (вторая сессия, опционально)
+## X11-приложения
 
-Встроенный Xwayland в sway 1.9 не тянул часть приложений (OnlyOffice вообще
-не стартовал, лечилось костылём `onlyoffice-xephyr` через Xephyr). Рядом
-поднята вторая GDM-сессия «Sway (satellite)»: тот же конфиг + `xwayland disable`
-и внешний `xwayland-satellite` на дисплее `:12`. Обычная сессия «Sway»
-не тронута и остаётся запасной.
+Используется стандартный встроенный в Sway Xwayland. Установщик устанавливает
+соответствующий пакет для дистрибутива. Обёрток над командой `sway`,
+фиксированного `DISPLAY` и зависимости от `xwayland-satellite` нет.
 
-Файлы в репо:
+## Личные ассоциации приложений
 
-| Файл | Назначение |
-| --- | --- |
-| `sway/.config/sway/config-satellite` | `include` общего конфига + `xwayland disable` + `exec satellite :12` и `exec xsettingsd` |
-| `sway/.local/bin/sway-satellite.sh` | обёртка сессии: `DISPLAY=:12`, `WLR_BACKENDS=drm,libinput` (без него wlroots падает с `Unable to create backend`, видя `DISPLAY` раньше старта satellite), запуск `sway -c config-satellite` |
-| `xsettingsd/.config/xsettingsd/xsettingsd.conf` | XSETTINGS с `Xft/DPI 147456` (=144 при скейле 1.5), иначе Qt/VMware берут 96 DPI и рисуют мелко |
+`~/.config/mimeapps.list` и личные `.desktop`-ярлыки в
+`~/.local/share/applications/` принадлежат пользователю и не связываются
+со Stow-пакетами. Выбор браузера, обработчиков файлов и локальные ярлыки
+не должны попадать в Git. При установке Thunar назначается только для
+каталогов и файловых схем, у которых ещё нет обработчика.
 
-Что НЕ в репо и ставится руками:
+При обновлении старой установки установщик преобразует прежнюю Stow-ссылку
+`mimeapps.list` в обычный файл, сохраняя доступное содержимое. Если исходник
+уже удалён обновлением Git, содержимое битой ссылки восстановить нельзя:
+личные ассоциации нужно сохранить до обновления.
 
-```bash
-sudo apt install -y xsettingsd
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-export PATH="$HOME/.cargo/bin:$PATH"
-mkdir -p /tmp/opencode && cd /tmp/opencode
-git clone --depth 1 https://github.com/Supreeeme/xwayland-satellite.git
-cd xwayland-satellite && cargo build --release
-cp target/release/xwayland-satellite ~/.local/bin/
-sudo cp ~/.local/share/wayland-sessions/sway-satellite.desktop /usr/share/wayland-sessions/
-```
+Handy необязателен и устанавливается отдельно пользователем. Если он есть
+в `PATH`, `Ctrl + Space` переключает запись и вставку распознанного текста;
+без Handy команда ничего не запускает.
 
-`sway-satellite.desktop` лежит в `~/.local/share/wayland-sessions/`
-(в git не входит — копия пользовательская):
+## Безопасные проверки
 
-```
-[Desktop Entry]
-Name=Sway (satellite)
-Comment=Sway with xwayland-satellite on :12 instead of built-in Xwayland
-Exec=/home/USER/.local/bin/sway-satellite.sh
-Type=Application
-```
-
-GDM не читает `~/.local/share/wayland-sessions`, поэтому файл копируется
-в `/usr/share/wayland-sessions`. После этого в шестерёнке GDM появляется
-«Sway (satellite)». Проверки после входа: `echo $DISPLAY` → `:12`,
-`ls /tmp/.X11-unix/` → `X12`. Откат — войти в обычный «Sway».
-
-Известные ограничения связки: popup repositioning не работает (sway 1.9 отдаёт
-`xdg_wm_base` v2), тень окон рисует сам клиент (у OnlyOffice — CEF,
-отключается только floating/fullscreen).
+Разработка ведётся в рабочем пользовательском окружении. Базовые проверки:
+`sh tests/check.sh`. Дополнительные тесты движка используют временные HOME/XDG,
+а графические интеграционные тесты — отдельные headless Sway и D-Bus.
+Перезагрузка, выход из рабочей сессии и её reload для тестов не нужны.
+Старые небезопасные тесты установщика, resilience и production удалены.
 
 ## Заметки
 

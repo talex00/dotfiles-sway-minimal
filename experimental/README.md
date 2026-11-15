@@ -82,14 +82,13 @@ bash experimental/test-look-v2.sh
 bash experimental/test-component-paths.sh
 python3 experimental/test-migration.py
 bash experimental/test-headless.sh
-bash experimental/test-production.sh
 sh tests/check.sh
 ```
 
-`test-production.sh` covers the full production path: legacy HOME bootstrap,
-stable-file installation, activation marker, private D-Bus, headless Sway,
-Waybar, swaync, Fuzzel, `look.sh set`, rollback, injected failure and repair.
-It also checks that the source tree is unchanged.
+The old installer, resilience and production-path suites were removed because
+their side effects were not fully isolated from the user's desktop. Tests must
+not reboot, reload or stop the live session, install packages, or write to its
+terminals.
 
 `test-headless.sh` additionally exercises generated Sway syntax and the
 isolated test-session apply path. `test-migration.py` covers dry-run, apply,

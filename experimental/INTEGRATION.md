@@ -144,20 +144,14 @@ sh ~/.config/sway/scripts/look.sh doctor
 sh ~/.config/sway/scripts/look.sh ensure
 ```
 
-## Resilience and Error Recovery (Task 8)
+## Safe test boundary
 
-The resilience suite `experimental/test-resilience.sh` exercises all 10 failure scenarios in an isolated sandbox with private D-Bus and headless Sway:
-
-1. **Nonexistent theme rejection**: Attempting to set an invalid theme returns non-zero, leaving active generation and preference files unmodified.
-2. **Malformed palette rejection**: Incomplete or syntactically invalid palette definitions fail validation prior to generation publication.
-3. **Sway config syntax validation**: `sway -c ... -C` checks generated syntax before reload; malformed directives abort transaction safely.
-4. **Injected publication/transition failure**: Pointers `current` and `previous` remain intact and uncorrupted.
-5. **Injected reload failure**: Generation pointers, installed files and GTK configurations roll back cleanly to pre-apply state.
-6. **Injected GTK apply failure**: Restores `settings.ini` for GTK 3/4 and `gsettings` properties from pre-apply snapshot.
-7. **Offline SWAYSOCK handling**: When `SWAYSOCK` is unset or unavailable, rendering/generation succeeds with exit 0, files install safely, and reload is gracefully skipped with clear notice.
-8. **Concurrency locking via flock**: Multi-process invocations cleanly serialize via `flock` on `.lock`, preventing split-brain states or pointer corruption.
-9. **Verification mismatch detection**: Tampered output files are detected by `verify_outputs` and repaired automatically by `ensure`.
-10. **Rollback transaction (`rollback-apply`)**: Restores previous generation, synchronizes output files, and live reloads Sway and applications.
+Development runs inside a live user desktop, not a disposable VM. Tests must
+not reboot, reload or stop that desktop, install packages, or modify its settings.
+The old installer, resilience and production-path suites were removed: changing
+HOME alone did not isolate the installer, resilience retained process-killing
+autostarts, and production reload broadcast colours to the user's terminals.
+Error recovery remains covered by the isolated generation and headless suites.
 
 ## Robust SWAYSOCK & D-Bus Auto-Discovery
 
@@ -219,14 +213,13 @@ bash experimental/test-look-v2.sh
 bash experimental/test-component-paths.sh
 python3 experimental/test-migration.py
 bash experimental/test-headless.sh
-bash experimental/test-production.sh
-bash experimental/test-resilience.sh
 sh tests/check.sh
 ```
 
-`test-production.sh` is the end-to-end production-path suite: isolated HOME,
-GTK keyfile backend, private D-Bus, headless Sway, Waybar, swaync, Fuzzel, a
-real `look.sh set`, rollback, injected failure and stable-file repair.
+`test-headless.sh` uses an isolated HOME, GTK keyfile backend, private D-Bus,
+headless Sway and explicit test process PIDs. It does not run desktop autostarts
+or the production reload path. No test requires rebooting or reloading the
+user's desktop.
 
 ## Known limits
 

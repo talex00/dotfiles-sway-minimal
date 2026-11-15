@@ -141,6 +141,10 @@ bindsym --to-code Ctrl+$mod+Mod1+R reload
 bindsym --to-code Ctrl+$mod+Mod1+m exec $scripts/toggle-monitors.sh
 bindsym Ctrl+Mod1+Delete exec $scripts/powermenu.sh
 
+# Необязательный Handy (устанавливается пользователем отдельно):
+# нажатие запускает запись, повторное — останавливает и вставляет текст.
+bindsym --release Ctrl+space exec sh -c 'command -v handy >/dev/null 2>&1 && exec handy --toggle-transcription'
+
 floating_modifier $mod normal
 
 # Круговой цикл по всем окнам workspace, включая плавающие.

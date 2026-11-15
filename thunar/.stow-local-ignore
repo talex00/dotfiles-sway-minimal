@@ -1,0 +1,2 @@
+# Mutable application associations must never be linked into the repository.
+mimeapps\.list

@@ -28,7 +28,7 @@ ROOTS = {
     '.config/xsettingsd': 'xsettingsd/.config/xsettingsd',
     '.local/share/xfce4': 'xfce/.local/share/xfce4',
 }
-FILES = {'.local/bin/sway-satellite.sh': 'sway/.local/bin/sway-satellite.sh'}
+FILES = {}
 MUTABLE = {
     '.config/sway': {'theme', 'border', 'smart-borders', 'gaps', 'bar-mode', 'bar-style', 'bar-position', 'cursor', 'cursor-size', 'look', 'wallpaper', 'monitors.conf', 'workspaces', 'outputs'},
     '.config/waybar': {'config.jsonc', 'theme.css', 'style-variant.css', 'state.css'},

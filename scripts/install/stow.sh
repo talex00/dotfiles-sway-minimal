@@ -96,6 +96,9 @@ backup_conflicting_paths() {
         find_files=$(cd "$repo_dir/$pkg" && find . -type f)
         for f in $find_files; do
             relfile="${f#./}"
+            # Never back up/remove personal associations, even if an ignored
+            # copy remains in an older source tree.
+            [ "$relfile" != ".config/mimeapps.list" ] || continue
             target_file="$target_home/$relfile"
 
             if [ -L "$target_file" ]; then
@@ -123,6 +126,44 @@ backup_conflicting_paths() {
         msg_ok "Previous configurations safely backed up to: $backup_root"
     fi
 }
+
+configure_mime_defaults() (
+    repo_dir="$1"
+    target_home="$2"
+    export HOME="$target_home" XDG_CONFIG_HOME="$target_home/.config"
+    export XDG_DATA_HOME="$target_home/.local/share"
+    export XDG_CURRENT_DESKTOP=sway DESKTOP_SESSION=sway
+    mimeapps="$XDG_CONFIG_HOME/mimeapps.list"
+    mkdir -p "$XDG_CONFIG_HOME"
+
+    # Older versions stowed this mutable file. Preserve its contents locally
+    # before xdg-mime can write through the link into the repository.
+    if [ -L "$mimeapps" ]; then
+        if [ "$(readlink -m "$mimeapps")" != "$(readlink -m "$repo_dir/thunar/.config/mimeapps.list")" ]; then
+            msg_info "Leaving externally managed MIME associations untouched."
+            return 0
+        fi
+        mime_tmp=$(mktemp "$XDG_CONFIG_HOME/.mimeapps.XXXXXXXX") || return 1
+        if [ -f "$mimeapps" ]; then
+            cp -L "$mimeapps" "$mime_tmp" || { rm -f "$mime_tmp"; return 1; }
+        else
+            # The old source may already have been removed by git pull.
+            printf '[Default Applications]\n' > "$mime_tmp"
+        fi
+        mv -f "$mime_tmp" "$mimeapps" || { rm -f "$mime_tmp"; return 1; }
+    fi
+
+    # Set only missing defaults; browser choices and personal launchers belong
+    # to the user, as do any existing file-manager preferences.
+    if command -v xdg-mime >/dev/null 2>&1; then
+        for mime in inode/directory x-scheme-handler/trash x-scheme-handler/file; do
+            current_default=$(xdg-mime query default "$mime" 2>/dev/null || true)
+            if [ -z "$current_default" ]; then
+                xdg-mime default thunar.desktop "$mime" 2>/dev/null || true
+            fi
+        done
+    fi
+)
 
 deploy_stow() {
     repo_dir="$1"
@@ -160,12 +201,7 @@ deploy_stow() {
         fi
     fi
 
-    # Register Thunar as default file manager for directories and file schemes
-    if command -v xdg-mime >/dev/null 2>&1; then
-        xdg-mime default thunar.desktop inode/directory 2>/dev/null || true
-        xdg-mime default thunar.desktop x-scheme-handler/trash 2>/dev/null || true
-        xdg-mime default thunar.desktop x-scheme-handler/file 2>/dev/null || true
-    fi
+    configure_mime_defaults "$repo_dir" "$target_home"
 
     # Configure virtual machine display environment (VMware / VirtualBox / QEMU / KVM)
     is_vm=0

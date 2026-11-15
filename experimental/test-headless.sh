@@ -2,7 +2,8 @@
 # Isolated integration test: never contacts a live Sway socket or user D-Bus.
 set -euo pipefail
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd -P)
-tmp=$(mktemp -d "${TMPDIR:-/tmp}/sway-headless-test.XXXXXXXX")
+# Keep nested render socket paths below Linux's Unix-domain socket limit.
+tmp=$(mktemp -d "${TMPDIR:-/tmp}/sway-h.XXXXXXXX")
 spid='' bpid='' fpid='' npid='' buspid=''
 cleanup() {
     if [[ -n $bpid ]] && [[ $(ps -o pgid= -p "$bpid" 2>/dev/null | tr -d ' ') == "$bpid" ]]; then

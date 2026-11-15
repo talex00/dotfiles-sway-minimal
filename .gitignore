@@ -10,6 +10,15 @@ sway/.config/sway/outputs
 sway/.config/sway/monitors.conf
 sway/.config/sway/workspaces
 
+# Личные скрипты: в репозитории хранится только пустая папка.
+sway/.config/sway/user-scripts/*
+!sway/.config/sway/user-scripts/.gitkeep
+
+# Личные MIME-ассоциации и ярлыки приложений не разворачиваются через Stow.
+thunar/.config/mimeapps.list
+sway/.local/share/applications/*
+!sway/.local/share/applications/network.cycles.wdisplays.desktop
+
 # Внешний вид: выбор и сгенерированные state-файлы (scripts/look.sh)
 sway/.config/sway/theme
 sway/.config/sway/border
